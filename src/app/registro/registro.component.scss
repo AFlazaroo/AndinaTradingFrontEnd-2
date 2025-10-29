@@ -1,0 +1,243 @@
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@700&display=swap');
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #060A1B;
+  font-family: 'Alegreya Sans', sans-serif;
+}
+
+.login-header {
+  background-color: #060A1B;
+  height: 60px;
+  width: 100%;
+  color: white;
+  font-family: 'Alegreya Sans', sans-serif;
+}
+
+.back-button {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 500;
+  text-decoration: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: 'Alegreya Sans', sans-serif;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+
+
+/* ------------------- HEADER ------------------- */
+.login-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.login-wrapper {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh; // ✅ permite crecer si hay más contenido
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  flex-direction: column; // ✅ evita errores si el contenido es largo
+}
+
+.login-label {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #444653;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.login-input {
+  max-width: 720px;
+  width: 100%;
+  height: 56px;
+  padding: 0 15px;
+  font-size: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  border-radius: 50px;
+}
+
+/* ------------------- FONDO GENERAL ------------------- */
+.fullscreen-bg {
+  min-height: 100vh;
+  background-image: url('/assets/fondo-login.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ------------------- FORMULARIO ------------------- */
+
+
+.login-box {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 3rem;
+  border-radius: 1.5rem;
+  max-width: 959px;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  
+}
+
+/* Título principal */
+.login-title {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 64px;
+  font-weight: 700;
+  color: #0CA77D;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Subtítulo */
+.login-subtitle {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #444653;
+  line-height: 1.4;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Etiquetas */
+.form-label {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: #444653;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Campos de entrada */
+input.form-control {
+  padding-left: 15px;
+  padding-right: 15px;
+  height: 45px;
+  font-size: 1rem;
+}
+
+/* Enlace de recuperación */
+a {
+  font-size: 0.85rem;
+  color: #333;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Botón Confirmar */
+.custom-login-btn {
+  width: 306px;
+  height: 75px;
+  background-color: #0CA77D;
+  border: 1px solid #0CA77D;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  font-size: 32px;
+  font-family: 'Alegreya Sans', sans-serif;
+  display: block;
+  margin: 0 auto;
+  transition: background-color 0.3s;
+  margin-top: 50px;
+
+  &:hover {
+    background-color: #099a70;
+    border-color: #099a70;
+  }
+
+  &:disabled {
+    background-color: #5E6E73;    // ✅ gris claro más visible
+    border-color: #5E6E73;
+    color: #FFF;
+    cursor: not-allowed;
+    opacity: 1;                    // ✅ asegura que no se vuelva transparente
+  }
+}
+
+/* Feedback de validación */
+.invalid-feedback {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.forgot-link {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #444653;
+  text-decoration: none;
+  display: block;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  margin-top: 50px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+ul.text-danger {
+    font-size: 14px;
+    margin-top: 0.5rem;
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+
+  .toggle-password-btn {
+    position: absolute;
+    top: 52px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #444653;
+    font-size: 1.2rem;
+    z-index: 2;
+  
+    &:hover {
+      color: #0CA77D;
+    }
+  
+    &:focus {
+      outline: none;
+    }
+  }
+  

@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans&display=swap');
+
+.dashboard-container {
+  background-color: #000218;
+  min-height: 100vh;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+:host {
+  display: block;
+  background-color: #000218;
+  min-height: 100vh;
+  font-family: 'Alegreya Sans', sans-serif;
+  margin: 0;
+}
+
+.dashboard-container {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.dashboard-title {
+  color: white;
+  font-size: 45px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: left;
+  font-family: 'Alegreya Sans', sans-serif;
+  line-height: 2.5;
+}
+
+.portfolio-value-box {
+  background-color: #2E3446;
+  border-radius: 20px;
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.portfolio-label {
+  font-size: 20px;
+  color: white;
+  margin: 0;
+  font-family: 'Alegreya Sans', sans-serif;
+  font-weight: 600;
+  font-size: 31px;
+}
+
+.portfolio-amount {
+  font-size: 42px;
+  color: #FFF;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: 'Alegreya Sans', sans-serif;
+ 
+}
+
+.data-box {
+  background-color: #2E3446;
+  border-radius: 12px;
+  padding: 20px;
+  max-height: 400px; // o la altura que consideres adecuada
+  overflow-y: auto;
+  scrollbar-width: thin; /* para Firefox */
+  scrollbar-color: #888 transparent;
+}
+
+.data-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.data-box::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.table-title {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 36px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ffffff;
+}
+
+.table {
+  background-color: transparent !important; // asegura que nada lo sobreescriba
+  color: white;
+  border-collapse: collapse;
+}
+
+.table thead,
+.table tbody,
+.table th,
+.table td {
+  background-color: transparent !important;
+}
+
+.table thead th {
+  color: #FFF;
+  font-size: 26px;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+  border: none; 
+  color: #FFF;
+  font-size: 24px;
+  font-family: 'Alegreya Sans', sans-serif;
+}
+
+.text-danger{
+  font-weight: 600;
+}
+
+.text-success {
+  font-weight: 600;
+}
+
+.info-top-bar {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 18px;
+}
+
+.info-top-bar {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 24px;
+}
+
+.info-top-bar .bi {
+  font-size: 2rem;
+  color: #0CA77D;
+}
+
+/* Línea blanca entre las filas del cuerpo */
+.table tbody tr {
+  border-bottom: 1px solid white;
+}
+
+/* Elimina la línea después de la última fila */
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Línea blanca debajo del encabezado */
+.table thead tr {
+  border-bottom: 1px solid white;
+}
+
+/* Quitar cualquier borde interno */
+.table td,
+.table th {
+  border: none;
+}
+
+.arvo-regular {
+  font-family: "Arvo", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.arvo-bold {
+  font-family: "Arvo", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.arvo-regular-italic {
+  font-family: "Arvo", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.arvo-bold-italic {
+  font-family: "Arvo", serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+// Estilos específicos para operaciones
+.operaciones-container {
+  background-color: #000218;
+  min-height: 100vh;
+}
+
+.card {
+  background-color: #1a1d2e;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(12, 167, 125, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  border: none;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
+    transform: scale(1.05);
+  }
+}

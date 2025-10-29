@@ -1,0 +1,126 @@
+<div class="container-fluid dashboard-container">
+  <div class="container-fluid px-lg-5 px-md-4 px-3">
+    <div class="d-flex align-items-center justify-content-between">
+  <h2 class="dashboard-title">Dashboard Principal</h2>
+  
+</div>
+    <div class="title-underline"></div>
+
+
+<p class="welcome-message">
+  {{ getSaludo() }}, {{ nombreCompleto }} 👋  
+</p>
+<p class="sub-welcome-message">
+  {{ getMensajePortafolio() }}
+</p>
+
+
+
+    <div class="info-top-bar d-flex justify-content-end align-items-center gap-4 mb-4">
+      <div class="clock text-white d-flex align-items-center">
+        <i class="bi bi-clock me-2"></i> {{ currentTime }}
+      </div>
+      <div class="location text-white d-flex align-items-center">
+        <i class="bi bi-geo-alt-fill me-2"></i> {{ location }}
+      </div>
+    </div>
+
+    <!-- Valor del portafolio -->
+    <div class="portfolio-value-box d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <p class="portfolio-label">
+  <i class="bi bi-briefcase-fill me-2 text-primary"></i>
+  Valor del portafolio
+</p>
+<h1 class="portfolio-amount">
+  <span class="currency-label">USD - $</span> {{ valorPortafolio | number:'1.0-0' }}
+</h1>
+<h1 class="portfolio-amount">
+  <span class="currency-label">COP - $</span> {{ valorPortafolio * 3850 | number:'1.0-0' }}
+</h1>
+      </div>
+      <img src="assets/line.png" alt="Gráfica" width="200" height="200" />
+    </div>
+
+    <!-- Tablas -->
+    <div class="row g-4">
+      <!-- Holdings -->
+      <div class="col-12 col-lg-6 d-flex">
+        <div class="data-box flex-fill">
+          <h5 class="table-title mb-3 d-flex justify-content-between align-items-center">
+  <span>
+    <i class="bi bi-pie-chart-fill me-2 text-info"></i> Holdings
+  </span>
+  <span class="total-holdings-value" (click)="alternarMoneda()" style="cursor: pointer;">
+    {{ mostrarEnCOP
+      ? (valorTotalHoldings * 3850 | currency:'COP  -   $':'symbol':'1.0-0')
+      : (valorTotalHoldings | currency:'USD  -   $':'symbol':'1.0-0') }}
+  </span>
+</h5>
+          <div class="table-responsive">
+            <table class="table table-borderless holdings-table">
+              <thead>
+                <tr>
+                  <th>Acción</th>
+                  <th>Cantidad</th>
+                  <th>Precio</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let holding of holdings">
+                  <td>
+                    <strong>{{ holding.accion }}</strong><br />
+                    <small style="color: #7B7566;">{{ holding.nombreCompania }}</small>
+                  </td>
+                  <td>{{ holding.cantidad }}</td>
+                  <td>{{ holding.precio_actual | currency: 'USD' }}</td>
+                  <td>{{ holding.precio_actual * holding.cantidad | currency: 'USD' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operaciones -->
+      <div class="col-12 col-lg-6 d-flex">
+  <div class="data-box flex-fill">
+   <h5 class="table-title mb-3">
+  <i class="bi bi-clock-history me-2 icon-historial"></i>
+  Historial de operaciones
+</h5>
+    <div class="table-responsive">
+      <table class="table table-borderless operations-table text-center">
+        <thead>
+          <tr>
+            <th>Acción</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+  *ngFor="let operacion of operaciones"
+  [ngClass]="{
+    'row-compra': operacion.tipo.toLowerCase() === 'compra',
+    'row-venta': operacion.tipo.toLowerCase() === 'venta'
+  }"
+>
+            <td>{{ operacion.accion }}</td>
+            <td [ngClass]="{
+                  'text-success': operacion.tipo === 'Compra',
+                  'text-danger': operacion.tipo === 'Venta'
+                }">
+              {{ operacion.tipo === 'compra' ? 'Compra' : 'Venta' }}
+            </td>
+            <td>{{ operacion.fecha }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+</div>

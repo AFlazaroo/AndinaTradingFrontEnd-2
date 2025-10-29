@@ -1,0 +1,156 @@
+<div class="mercado-container p-4">
+  <!-- Título -->
+  <div class="mb-4">
+    <h2 class="text-white">Mercado Colombiano</h2>
+    <p class="text-muted">Acciones de la Bolsa de Valores de Colombia (BVC)</p>
+  </div>
+
+  <!-- Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white mt-3">Cargando datos del mercado colombiano...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="uiMessage && !loading" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ uiMessage }}
+  </div>
+
+  <!-- Acciones Destacadas -->
+  <div *ngIf="!loading && accionesDestacadas.length > 0" class="mb-5">
+    <h4 class="text-white mb-3">
+      <i class="bi bi-star-fill text-warning me-2"></i>
+      Acciones Destacadas
+    </h4>
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let accion of accionesDestacadas">
+        <div class="card h-100 shadow-sm text-white destacada-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">{{ accion.simbolo }}</h5>
+                <small class="text-muted">{{ accion.nombre }}</small>
+              </div>
+              <span class="badge bg-warning">Destacada</span>
+            </div>
+
+            <div class="precio-info mb-3">
+              <h3 class="text-primary mb-1">{{ accion.precioActual | currency:'COP':'symbol':'1.0-0' }}</h3>
+              <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
+                <i [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ getVariacionPorcentual(accion) | number:'1.2-2' }}%
+              </small>
+            </div>
+
+            <!-- Gráfico de TradingView -->
+            <div class="chart-container mb-3" *ngIf="deberaMostrarGrafico(accion.simbolo)">
+              <iframe
+                [src]="getChartUrl(accion.simbolo)"
+                width="100%"
+                height="200"
+                frameborder="0"
+                allowtransparency="true"
+                scrolling="no"
+                style="border: none;">
+              </iframe>
+            </div>
+
+            <!-- Placeholder cuando el gráfico no está disponible -->
+            <div *ngIf="!deberaMostrarGrafico(accion.simbolo)" class="chart-placeholder mb-3">
+              <i class="bi bi-graph-up-arrow text-primary" style="font-size: 3rem;"></i>
+              <p class="text-muted mt-2 mb-0">{{ accion.nombre }}</p>
+              <small class="text-muted">Gráfico no disponible</small>
+            </div>
+
+            <button class="btn btn-success w-100" (click)="abrirModalCompra(accion.simbolo)">
+              <i class="bi bi-cart-plus me-2"></i>Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Todas las Acciones -->
+  <div *ngIf="!loading && acciones.length > 0" class="mb-4">
+    <h4 class="text-white mb-3">
+      <i class="bi bi-graph-up me-2"></i>
+      Todas las Acciones Disponibles
+    </h4>
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let accion of acciones">
+        <div class="card h-100 shadow-sm text-white accion-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">{{ accion.simbolo }}</h5>
+                <small class="text-muted">{{ accion.nombre }}</small>
+              </div>
+            </div>
+
+            <div class="precio-info mb-3">
+              <h4 class="text-primary mb-1">{{ accion.precioActual | currency:'COP':'symbol':'1.0-0' }}</h4>
+              <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
+                <i [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ getVariacionPorcentual(accion) | number:'1.2-2' }}%
+              </small>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="info-adicional mb-3 small text-muted">
+              <div *ngIf="accion.volumen" class="mb-1">
+                <i class="bi bi-bar-chart me-1"></i>
+                Volumen: {{ accion.volumen | number:'1.0-0' }}
+              </div>
+              <div *ngIf="accion.apertura" class="mb-1">
+                Apertura: {{ accion.apertura | currency:'COP':'symbol':'1.0-0' }}
+              </div>
+              <div *ngIf="accion.maximo && accion.minimo">
+                Rango: {{ accion.minimo | currency:'COP':'symbol':'1.0-0' }} - {{ accion.maximo | currency:'COP':'symbol':'1.0-0' }}
+              </div>
+            </div>
+
+            <!-- Gráfico compacto -->
+            <div class="chart-container-small mb-3" *ngIf="deberaMostrarGrafico(accion.simbolo)">
+              <iframe
+                [src]="getChartUrl(accion.simbolo)"
+                width="100%"
+                height="150"
+                frameborder="0"
+                allowtransparency="true"
+                scrolling="no"
+                style="border: none;">
+              </iframe>
+            </div>
+
+            <!-- Placeholder compacto cuando el gráfico no está disponible -->
+            <div *ngIf="!deberaMostrarGrafico(accion.simbolo)" class="chart-placeholder-small mb-3">
+              <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
+              <p class="text-muted small mb-0">{{ accion.simbolo }}</p>
+              <small class="text-muted" style="font-size: 0.7rem;">No disponible</small>
+            </div>
+
+            <button class="btn btn-outline-success w-100" (click)="abrirModalCompra(accion.simbolo)">
+              <i class="bi bi-cart-plus me-2"></i>Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay datos -->
+  <div *ngIf="!loading && acciones.length === 0 && !uiMessage" class="text-center my-5">
+    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+    <p class="text-muted mt-3">No hay acciones disponibles en este momento</p>
+  </div>
+</div>
+
+<!-- Modal de compra -->
+<app-modal-compra
+  [symbol]="symbolSeleccionado"
+  (confirmar)="onConfirmarCompra($event)">
+</app-modal-compra>

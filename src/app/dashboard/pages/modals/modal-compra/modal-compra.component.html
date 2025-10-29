@@ -1,0 +1,22 @@
+<!-- modal-compra.component.html -->
+<div class="modal fade" #modalCompra id="modalCompra" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title">Comprar acciones</h5>
+        <button type="button" class="btn-close" (click)="close()" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Vas a comprar acciones de <strong>{{ symbol }}</strong></p>
+        <div class="mb-3">
+          <label class="form-label">Cantidad</label>
+          <input type="number" [(ngModel)]="cantidad" min="1" class="form-control" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="close()">Cancelar</button>
+        <button class="btn btn-primary" (click)="onConfirmar()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

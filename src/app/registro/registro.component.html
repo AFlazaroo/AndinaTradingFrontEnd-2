@@ -1,0 +1,129 @@
+
+
+<header class="login-header d-flex align-items-center px-4 py-3">
+    <button class="btn btn-link back-button" (click)="goBack()">
+      ← Volver
+    </button>
+
+</header>
+  
+  <div class="login-container">
+    <!-- Imagen debajo como fondo visual -->
+    <img src="assets/fondo.png" alt="Fondo" class="background-image" />
+  
+    <!-- Contenido encima -->
+    <div class="login-wrapper">
+      <div class="login-box bg-white bg-opacity-75 p-5 rounded-4 shadow-lg">
+        <h1 class="login-title text-center">Crea tu cuenta</h1>
+        <p class="login-subtitle text-center">
+          Regístrate para empezar a invertir en los mejores mercados financieros
+        </p>
+  
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="firstName" class="form-label login-label">Nombre</label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              class="form-control login-input"
+              placeholder="Ingresa tu nombre"
+            />
+          </div>
+  
+          <div class="mb-3">
+            <label for="lastName" class="form-label login-label">Apellido</label>
+            <input
+              type="text"
+              id="lastName"
+              formControlName="lastName"
+              class="form-control login-input"
+              placeholder="Ingresa tu apellido"
+            />
+          </div>
+  
+          <div class="mb-3">
+            <label for="email" class="form-label login-label">Correo</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control login-input"
+              placeholder="Ingresa tu correo"
+            />
+          </div>
+  
+          <div class="mb-3">
+            <label for="phone" class="form-label login-label">Teléfono</label>
+            <input
+              type="tel"
+              id="phone"
+              formControlName="phone"
+              class="form-control login-input"
+              placeholder="Ingresa tu teléfono"
+            />
+          </div>
+  
+          <div class="row">
+            <div class="col-md-6 mb-3 position-relative">
+                <label for="password" class="form-label login-label">Contraseña</label>
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  id="password"
+                  formControlName="password"
+                  class="form-control login-input pe-5"
+                  placeholder="Contraseña"
+                />
+                <button
+  type="button"
+  class="toggle-password-btn"
+  (click)="togglePasswordVisibility()"
+  aria-label="Mostrar u ocultar contraseña"
+>
+  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+</button>
+              
+                <!-- Validaciones -->
+                <ul class="text-danger small mt-2 ps-3" *ngIf="registerForm.get('password')?.touched">
+                  <li *ngIf="!passwordErrors.length">Mínimo 6 caracteres</li>
+                  <li *ngIf="!passwordErrors.hasUpperCase">Debe contener al menos una letra mayúscula</li>
+                  <li *ngIf="!passwordErrors.hasNumber">Debe contener al menos un número</li>
+                  <li *ngIf="!passwordErrors.hasSymbol">Debe contener al menos un símbolo</li>
+                  <li *ngIf="!passwordErrors.hasLetters">Debe tener letras y números</li>
+                </ul>
+              </div>
+  
+              <div class="col-md-6 mb-3 position-relative">
+                <label for="confirmPassword" class="form-label login-label">Confirmar contraseña</label>
+                <input
+                  [type]="showConfirmPassword ? 'text' : 'password'"
+                  id="confirmPassword"
+                  formControlName="confirmPassword"
+                  class="form-control login-input pe-5"
+                  placeholder="Confirmar"
+                />
+                <button
+                  type="button"
+                  class="toggle-password-btn"
+                  (click)="toggleConfirmPasswordVisibility()"
+                >
+                  <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+                <div class="text-danger small mt-2" *ngIf="registerForm.get('confirmPassword')?.touched && !passwordsMatch">
+                  Las contraseñas no coinciden
+                </div>
+            </div>
+        </div>
+              
+  
+              <button
+              type="submit"
+              class="btn custom-login-btn mt-3"
+              [disabled]="registerForm.invalid || !passwordsMatch || !allPasswordRulesPass()"
+            >
+              Confirmar
+            </button>
+        </form>
+      </div>
+    </div>
+  </div>

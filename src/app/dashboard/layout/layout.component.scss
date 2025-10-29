@@ -1,0 +1,148 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  overflow-x: hidden; /* ✅ solo oculta scroll horizontal si acaso */
+}
+.main-content {
+background: linear-gradient(135deg, #000218 0%, #0c0c1f 25%, #1a1a2e 50%, #2a1b28 85%, #382033 100%);
+
+
+
+
+  min-height: 100vh;
+  padding: 0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  overflow-y: auto;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #000218;
+}
+
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+     background: linear-gradient(to bottom, #0c0f1a, #1a2636, #223344);
+
+
+}
+.sidebar-expanded {
+    width: 400px;
+    transition: width 0.3s ease;
+  }
+  
+  .sidebar-collapsed {
+    width: 100px;
+    transition: width 0.3s ease;
+  
+    .nav-link span,
+    .user-name {
+      display: none;
+    }
+  
+    .toggle-btn {
+      align-self: center !important;
+    }
+  }
+  
+  .nav-link {
+    font-family: 'Alegreya Sans', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 20px;
+  
+    &:hover {
+      color: #0CA77D;
+    }
+  
+    &.active {
+      color: #0CA77D;
+    }
+  }
+    .toggle-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #FFF;
+      &:hover {
+        color: #0CA77D;
+      }
+    }
+  
+    .user-name {
+      font-style: italic;
+      font-size: 32px;
+      color: #fff;
+      font-family: 'Alegreya Sans', sans-serif;
+    }
+  
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #444;
+      font-size: 18px;
+      font-family: 'Alegreya Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%; // ✅ Añade esto si no se ve completo
+    
+      &:hover {
+        color: #0CA77D;
+        text-decoration: underline;
+      }
+    }
+    
+  .toggle-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    align-self: flex-end;
+  
+    &:hover {
+      color: #0CA77D;
+      cursor: pointer;
+    }
+  
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .logout-btn {
+    font-family: 'Alegreya Sans', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #dc3545; // rojo Bootstrap
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 25px;
+    transition: background-color 0.3s ease;
+  
+    &:hover {
+      background-color: #bb2d3b; // rojo más oscuro
+      cursor: pointer;
+      color: white;
+    }
+  
+    i {
+      font-size: 18px;
+    }
+  }

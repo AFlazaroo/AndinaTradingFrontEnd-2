@@ -1,0 +1,72 @@
+<div class="operaciones-container p-4">
+  <div class="mb-4">
+    <h2 class="text-white">Historial de Transacciones</h2>
+    <p class="text-muted">Registro completo de tus operaciones de trading</p>
+  </div>
+
+  <!-- Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white mt-3">Cargando transacciones...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !loading" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Tabla de transacciones -->
+  <div *ngIf="!loading && !errorMessage" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th><i class="bi bi-tag me-2"></i>Símbolo</th>
+              <th><i class="bi bi-building me-2"></i>Empresa</th>
+              <th><i class="bi bi-arrow-left-right me-2"></i>Tipo</th>
+              <th><i class="bi bi-hash me-2"></i>Cantidad</th>
+              <th><i class="bi bi-currency-dollar me-2"></i>Precio</th>
+              <th><i class="bi bi-calculator me-2"></i>Total</th>
+              <th><i class="bi bi-calendar me-2"></i>Fecha</th>
+              <th><i class="bi bi-info-circle me-2"></i>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaccion of transacciones">
+              <td class="fw-bold">{{ transaccion.simbolo }}</td>
+              <td>{{ transaccion.nombreEmpresa }}</td>
+              <td>
+                <span class="badge" [ngClass]="transaccion.tipoTransaccion === 'COMPRA' ? 'bg-success' : 'bg-danger'">
+                  <i [class]="getIconoTipo(transaccion.tipoTransaccion)" class="me-1"></i>
+                  {{ transaccion.tipoTransaccion }}
+                </span>
+              </td>
+              <td>{{ transaccion.cantidad }}</td>
+              <td>{{ transaccion.precio | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="fw-bold">{{ transaccion.total | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td>
+                <small>{{ transaccion.fechaTransaccion | date:'short' }}</small>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ transaccion.estado || 'COMPLETADA' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sin transacciones -->
+      <div *ngIf="transacciones.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+        <p class="text-muted mt-3">No hay transacciones registradas</p>
+        <a routerLink="/dashboard/mercado" class="btn btn-primary mt-2">
+          <i class="bi bi-cart-plus me-2"></i>Ir al Mercado
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
