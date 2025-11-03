@@ -1,0 +1,83 @@
+.modal-content {
+  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  border: none;
+  border-radius: 15px;
+  color: white;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  .modal-title {
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-close {
+  filter: invert(1);
+}
+
+.info-card {
+  background: rgba(12, 167, 125, 0.1);
+  border: 1px solid rgba(12, 167, 125, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+
+  .info-label {
+    color: #ccc;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-value {
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+
+    &.small {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.chart-container {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.table {
+  color: white;
+
+  thead {
+    background-color: rgba(12, 167, 125, 0.2);
+    
+    th {
+      border-bottom: 2px solid rgba(12, 167, 125, 0.5);
+      font-weight: 600;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: all 0.3s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      &:hover {
+        background-color: rgba(12, 167, 125, 0.1);
+      }
+    }
+  }
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  border: none;
+}
+

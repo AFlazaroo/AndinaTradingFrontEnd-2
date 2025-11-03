@@ -126,6 +126,40 @@ background: linear-gradient(135deg, #000218 0%, #0c0c1f 25%, #1a1a2e 50%, #2a1b2
   align-items: center;
   gap: 0.5rem;
 }
+
+.summary-card {
+  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(12, 167, 125, 0.3);
+  }
+
+  .card-title {
+    color: #ccc;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .card-value {
+    color: #0CA77D;
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: bold;
+    
+    &.text-info {
+      color: #17a2b8;
+    }
+    
+    &.text-primary {
+      color: #0d6efd;
+    }
+  }
+}
 .table {
   background-color: transparent !important; // asegura que nada lo sobreescriba
   color: white;

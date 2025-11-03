@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { UserService } from '../../../services/users/users.service';
+import { MercadoColombiaService } from '../../../services/mercado-colombia/mercado-colombia.service';
 import { CurrencyPipe } from '@angular/common';
 
 import { DashboardUsuarioDTO, Holding, Operacion, Orden, Usuario } from '../../../models/usuario';
+import { PortafolioCompleto, PosicionPaper, ResumenPortafolio } from '../../../models/paper-trading.model';
 
 
 
 @Component({
   selector: 'app-principal',
   standalone: true,
-  imports: [CommonModule ],
+  imports: [CommonModule, RouterModule],
   providers: [CurrencyPipe],
   templateUrl: './principal.component.html',
   styleUrls: ['./principal.component.scss']
@@ -19,14 +22,33 @@ import { DashboardUsuarioDTO, Holding, Operacion, Orden, Usuario } from '../../.
 export class PrincipalComponent implements OnInit {
   currentTime: string = '';
   location: string = 'Cargando ubicación...';
-  valorPortafolio: number = 0;
-  holdings: any[] = [];
-  operaciones: any[] = [];
-nombreCompleto = '';
-valorTotalHoldings: number = 0;
-mostrarEnCOP: boolean = false;
+  
+  // Datos del portafolio
+  portafolio: PortafolioCompleto | null = null;
+  resumen: ResumenPortafolio | null = null;
+  loading: boolean = true;
+  
+  // Valores del resumen
+  balanceInicial: number = 0;
+  balanceDisponible: number = 0;
+  valorInvertido: number = 0;
+  valorTotal: number = 0;
+  gananciaPerdida: number = 0;
+  porcentajeGananciaPerdida: number = 0;
+  estado: 'GANANDO' | 'PERDIENDO' | 'NEUTRO' = 'NEUTRO';
+  estaGanando: boolean = false;
+  estaPerdiendo: boolean = false;
+  totalAcciones: number = 0;
+  cantidadEmpresas: number = 0;
+  posiciones: PosicionPaper[] = [];
+  
+  nombreCompleto = '';
+  mostrarEnCOP: boolean = false;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private mercadoService: MercadoColombiaService
+  ) {}
 
   ngOnInit(): void {
   this.getLocation();
@@ -43,7 +65,7 @@ mostrarEnCOP: boolean = false;
 }
 
 getMensajePortafolio(): string {
-  if (this.holdings && this.holdings.length > 0) {
+  if (this.posiciones && this.posiciones.length > 0) {
     return 'Revisa tu portafolio y tus operaciones más recientes.';
   } else {
     return 'Aún no tienes acciones registradas. ¡Empieza a invertir hoy!';
@@ -65,46 +87,100 @@ getMensajePortafolio(): string {
       });
   }
 loadDashboardData(): void {
-  const idUsuario = localStorage.getItem('idUsuario');
-  if (!idUsuario) {
-    console.warn('No se encontró idUsuario en localStorage');
+  // Obtener usuarioId del localStorage (priorizar 'usuarioId' pero mantener compatibilidad)
+  const usuarioId = Number(localStorage.getItem('usuarioId') || localStorage.getItem('idUsuario'));
+  
+  if (!usuarioId) {
+    console.warn('No se encontró usuarioId en localStorage');
+    this.loading = false;
     return;
   }
 
-  this.userService.getDashboardData(+idUsuario).subscribe({
+  // Cargar datos del usuario para el nombre
+  this.userService.getDashboardData(usuarioId).subscribe({
     next: (data) => {
-      console.log('DATA RECIBIDA:', data);
-
-      this.valorPortafolio = data.valorPortafolio?.usd || 0;
       this.nombreCompleto = `${data.nombre} ${data.apellido}`;
-      this.holdings = data.holdings || [];
-
-      this.valorTotalHoldings = this.holdings.reduce(
-        (total, h) => total + (h.precio_actual * h.cantidad),
-        0
-      );
-
-      this.operaciones = (data.operaciones || []).map((op: any) => ({
-        ...op,
-        tipo: op.tipo === 'compra' ? 'Compra' : 'Venta'
-      }));
     },
     error: (err) => {
-      console.error('Error cargando datos del dashboard:', err);
+      console.error('Error cargando datos del usuario:', err);
+    }
+  });
+
+  // Cargar resumen del portafolio (nuevo endpoint)
+  this.loading = true;
+  this.mercadoService.getResumenPortafolio(usuarioId).subscribe({
+    next: (resumenData) => {
+      console.log('✅ Resumen del portafolio recibido:', resumenData);
+      this.resumen = resumenData;
+      
+      // Mapear los datos del resumen
+      this.balanceInicial = resumenData.balanceInicial || 0;
+      this.balanceDisponible = resumenData.balanceDisponible || 0;
+      this.valorInvertido = resumenData.valorInvertido || 0;
+      this.valorTotal = resumenData.valorTotal || 0;
+      this.gananciaPerdida = resumenData.gananciaPerdida || 0;
+      this.porcentajeGananciaPerdida = resumenData.porcentaje || 0;
+      this.estado = resumenData.estado || 'NEUTRO';
+      this.estaGanando = resumenData.estaGanando || false;
+      this.estaPerdiendo = resumenData.estaPerdiendo || false;
+      this.totalAcciones = resumenData.totalAcciones || 0;
+      this.cantidadEmpresas = resumenData.cantidadEmpresas || 0;
+      
+      // También cargar el portafolio completo para las posiciones
+      this.cargarPosiciones(usuarioId);
+    },
+    error: (err) => {
+      console.error('❌ Error cargando resumen:', err);
+      this.loading = false;
+      // Si falla, intentar con el método anterior
+      this.loadDashboardDataFallback(usuarioId);
     }
   });
 }
 
-// Método para mapear las órdenes a operaciones
-mapOrdenesToOperaciones(ordenes: Orden[]): any[] {
-  return ordenes.map(orden => ({
-    tipo: orden.tipo_orden === 'market_order' ? 'Compra' : 'Venta', // Tipo de orden (puedes ajustar esto si es necesario)
-    fecha: orden.fecha_creacion // Fecha de la orden
-  }));
+cargarPosiciones(usuarioId: number): void {
+  // Cargar posiciones para mostrar en la tabla
+  this.mercadoService.getPosicionesUsuario(usuarioId).subscribe({
+    next: (posicionesData) => {
+      console.log('✅ Posiciones recibidas:', posicionesData);
+      this.posiciones = posicionesData || [];
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('❌ Error cargando posiciones:', err);
+      this.posiciones = [];
+      this.loading = false;
+    }
+  });
+}
+
+loadDashboardDataFallback(usuarioId: number): void {
+  // Fallback al método anterior si el nuevo endpoint falla
+  this.userService.getDashboardData(usuarioId).subscribe({
+    next: (data) => {
+      this.valorTotal = data.valorPortafolio?.usd || 0;
+      this.nombreCompleto = `${data.nombre} ${data.apellido}`;
+    },
+    error: (err) => {
+      console.error('Error en fallback:', err);
+    }
+  });
 }
 
 alternarMoneda(): void {
   this.mostrarEnCOP = !this.mostrarEnCOP;
+}
+
+getColorGanancia(ganancia: number): string {
+  if (ganancia > 0) return 'text-success';
+  if (ganancia < 0) return 'text-danger';
+  return 'text-muted';
+}
+
+getIconoGanancia(ganancia: number): string {
+  if (ganancia > 0) return 'bi-arrow-up-circle';
+  if (ganancia < 0) return 'bi-arrow-down-circle';
+  return 'bi-dash-circle';
 }
 
 

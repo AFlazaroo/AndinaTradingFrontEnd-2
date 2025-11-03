@@ -46,105 +46,125 @@ export class LoginComponent {
     }
 
     const { email, password } = this.loginForm.value;
-    console.log('Intentando login con:', { email });
+    this.errorMessage = '';
+    console.log('🔐 Intentando login unificado con:', { email });
 
-    // Intentar primero con el login completo que devuelve el objeto con ID
-    this.userService.loginCompleto(email, password).subscribe({
+    // Usar el login unificado que detecta automáticamente el tipo de usuario
+    this.userService.loginUnificado(email, password).subscribe({
       next: (response: any) => {
-        console.log('✅ Login exitoso, respuesta completa:', response);
+        console.log('✅ Login unificado exitoso:', response);
         
-        // Guardar todos los datos del usuario
+        // Validar que la respuesta sea exitosa
+        if (!response.success) {
+          this.errorMessage = 'Error al iniciar sesión. Credenciales inválidas.';
+          return;
+        }
+
+        // Guardar el ID del usuario
         if (response.id) {
-          localStorage.setItem('idUsuario', response.id.toString());
-        } else {
-          // Fallback si no viene el ID
-          localStorage.setItem('idUsuario', '1');
-          console.warn('⚠️ Backend no devolvió ID, usando ID por defecto: 1');
+          localStorage.setItem('usuarioId', response.id.toString());
+          localStorage.setItem('idUsuario', response.id.toString()); // Mantener compatibilidad
+          console.log('✅ ID de usuario guardado:', response.id);
+        }
+
+        // Guardar tipo de usuario (TRADER o COMISIONISTA)
+        if (response.tipoUsuario) {
+          localStorage.setItem('tipoUsuario', response.tipoUsuario);
         }
         
-        localStorage.setItem('rol', response.rol || response.role || 'Trader');
-        localStorage.setItem('token', response.token || 'temp-token-' + Date.now());
+        // Guardar rol (puede venir o no según el tipo)
+        if (response.rol) {
+          localStorage.setItem('rol', response.rol);
+        } else if (response.tipoUsuario === 'TRADER') {
+          localStorage.setItem('rol', 'Trader');
+        } else if (response.tipoUsuario === 'COMISIONISTA') {
+          localStorage.setItem('rol', 'Comisionista');
+        }
         
+        // Guardar nombre completo
         if (response.nombre) {
+          const nombreCompleto = response.apellido 
+            ? `${response.nombre} ${response.apellido}` 
+            : response.nombre;
+          localStorage.setItem('nombreUsuario', nombreCompleto);
           localStorage.setItem('nombre', response.nombre);
         }
+        
+        // Guardar email
         if (response.email) {
           localStorage.setItem('email', response.email);
         }
+
+        // Guardar estado
+        if (response.estado !== undefined) {
+          localStorage.setItem('estado', response.estado.toString());
+        }
+
+        // Guardar token si existe
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        } else {
+          localStorage.setItem('token', 'temp-token-' + Date.now());
+        }
         
         console.log('✅ Datos guardados en localStorage:', {
-          idUsuario: localStorage.getItem('idUsuario'),
+          usuarioId: localStorage.getItem('usuarioId'),
+          tipoUsuario: localStorage.getItem('tipoUsuario'),
+          nombreUsuario: localStorage.getItem('nombreUsuario'),
           rol: localStorage.getItem('rol'),
-          nombre: localStorage.getItem('nombre'),
-          email: localStorage.getItem('email')
+          email: localStorage.getItem('email'),
+          estado: localStorage.getItem('estado')
         });
 
-        // Redirigir según el rol
-        const rol = response.rol || response.role || 'Trader';
-        switch (rol.trim()) {
-          case 'Trader':
-          case 'Traderz':
+        // Redirigir según el campo redirigirA de la respuesta
+        if (response.redirigirA) {
+          switch (response.redirigirA) {
+            case 'panel-trader':
+              console.log('📍 Redirigiendo a panel de trader...');
+              this.router.navigate(['/dashboard']);
+              break;
+            case 'panel-comisionista':
+              console.log('📍 Redirigiendo a panel de comisionista...');
+              this.router.navigate(['/comisionista']);
+              break;
+            default:
+              console.warn('⚠️ Valor de redirigirA no reconocido:', response.redirigirA);
+              // Fallback: redirigir según tipoUsuario
+              if (response.tipoUsuario === 'TRADER') {
+                this.router.navigate(['/dashboard']);
+              } else if (response.tipoUsuario === 'COMISIONISTA') {
+                this.router.navigate(['/comisionista']);
+              } else {
+                this.errorMessage = 'Tipo de usuario no reconocido';
+              }
+              break;
+          }
+        } else {
+          // Fallback si no viene redirigirA: usar tipoUsuario
+          console.warn('⚠️ No se recibió redirigirA, usando tipoUsuario como fallback');
+          if (response.tipoUsuario === 'TRADER') {
             this.router.navigate(['/dashboard']);
-            break;
-          case 'Comisionista':
+          } else if (response.tipoUsuario === 'COMISIONISTA') {
             this.router.navigate(['/comisionista']);
-            break;
-          case 'Administrador':
-            this.router.navigate(['/admin']);
-            break;
-          case 'AreaLegal':
-            this.router.navigate(['/legal']);
-            break;
-          case 'JuntaDirectiva':
-            this.router.navigate(['/junta']);
-            break;
-          default:
-            this.errorMessage = 'Rol no reconocido: ' + rol;
-            break;
+          } else {
+            this.errorMessage = 'Error: No se pudo determinar la redirección';
+          }
         }
       },
       error: (err) => {
-        console.error('❌ Error en login completo, intentando login simple:', err);
+        console.error('❌ Error en login unificado:', err);
         
-        // Fallback: Intentar con el login simple que solo devuelve el rol
-        this.userService.login(email, password).subscribe({
-          next: (rol: string) => {
-            console.log('✅ Login simple exitoso, rol:', rol);
-            
-            localStorage.setItem('rol', rol);
-            localStorage.setItem('token', 'temp-token-' + Date.now());
-            localStorage.setItem('idUsuario', '1'); // ID por defecto
-            
-            console.warn('⚠️ Usando ID de usuario por defecto: 1');
-            
-            // Redirigir según el rol
-            switch (rol.trim()) {
-              case 'Trader':
-              case 'Traderz':
-                this.router.navigate(['/dashboard']);
-                break;
-              case 'Comisionista':
-                this.router.navigate(['/comisionista']);
-                break;
-              case 'Administrador':
-                this.router.navigate(['/admin']);
-                break;
-              case 'AreaLegal':
-                this.router.navigate(['/legal']);
-                break;
-              case 'JuntaDirectiva':
-                this.router.navigate(['/junta']);
-                break;
-              default:
-                this.errorMessage = 'Rol no reconocido: ' + rol;
-                break;
-            }
-          },
-          error: (err2) => {
-            console.error('❌ Error en ambos intentos de login:', err2);
-            this.errorMessage = 'Error al iniciar sesión. Por favor, intente nuevamente.';
-          }
-        });
+        let mensajeError = 'Error al iniciar sesión. Por favor, verifica tus credenciales.';
+        
+        if (err.status === 401 || err.status === 403) {
+          mensajeError = 'Credenciales inválidas. Por favor, verifica tu email y contraseña.';
+        } else if (err.status === 404) {
+          mensajeError = 'Usuario no encontrado. Por favor, verifica tu email.';
+        } else if (err.status === 0) {
+          mensajeError = 'Error de conexión. Verifica que el servidor esté en ejecución.';
+        }
+        
+        this.errorMessage = mensajeError;
       }
     });
   }

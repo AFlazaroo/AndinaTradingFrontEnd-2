@@ -3,7 +3,9 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AccionColombia, ListadoAcciones, OrdenMercado, RespuestaOrden } from '../../models/mercado-colombia.model';
-import { CuentaPaper, PosicionPaper, TransaccionPaper, RespuestaOperacion } from '../../models/paper-trading.model';
+import { CuentaPaper, PosicionPaper, TransaccionPaper, RespuestaOperacion, PortafolioCompleto, ResumenPortafolio } from '../../models/paper-trading.model';
+import { HistorialPreciosResponse } from '../../models/historial-precios.model';
+import { OrdenComisionista, RespuestaOrden as RespuestaOrdenComisionista } from '../../models/orden-comisionista.model';
 
 @Injectable({
   providedIn: 'root'
@@ -120,22 +122,20 @@ export class MercadoColombiaService {
 
   /**
    * Vende acciones en modo paper trading
+   * El precio se obtiene automáticamente del mercado en tiempo real desde TWS
    * @param usuarioId ID del usuario
    * @param simbolo Símbolo de la acción
    * @param cantidad Cantidad de acciones a vender
-   * @param precio Precio de venta
    */
   venderAccionesPaper(
     usuarioId: number,
     simbolo: string,
-    cantidad: number,
-    precio: number
+    cantidad: number
   ): Observable<string> {
     const params = new HttpParams()
       .set('usuarioId', usuarioId.toString())
       .set('simbolo', simbolo)
-      .set('cantidad', cantidad.toString())
-      .set('precio', precio.toString());
+      .set('cantidad', cantidad.toString());
 
     return this.http.post(`${this.baseUrl}/paper/vender`, null, {
       params,
@@ -174,6 +174,26 @@ export class MercadoColombiaService {
   }
 
   /**
+   * Obtiene el portafolio completo del usuario con todos los detalles
+   * @param usuarioId ID del usuario
+   */
+  getPortafolioCompleto(usuarioId: number): Observable<PortafolioCompleto> {
+    const params = new HttpParams().set('usuarioId', usuarioId.toString());
+    return this.http.get<PortafolioCompleto>(`${this.baseUrl}/paper/portafolio`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtiene el resumen del portafolio del usuario con información consolidada
+   * @param usuarioId ID del usuario
+   */
+  getResumenPortafolio(usuarioId: number): Observable<ResumenPortafolio> {
+    const params = new HttpParams().set('usuarioId', usuarioId.toString());
+    return this.http.get<ResumenPortafolio>(`${this.baseUrl}/paper/resumen`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
    * Manejo centralizado de errores
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
@@ -192,6 +212,57 @@ export class MercadoColombiaService {
     }
     
     return throwError(() => new Error(errorMessage));
+  }
+
+  /**
+   * Obtiene el historial de precios de una acción (últimos 5 días hábiles)
+   * GET /api/mercado-colombia/paper/historial-precios/{simbolo}
+   * @param simbolo Símbolo de la acción (ej: AAPL, EC, CIB)
+   */
+  getHistorialPrecios(simbolo: string): Observable<HistorialPreciosResponse> {
+    return this.http.get<HistorialPreciosResponse>(`${this.baseUrl}/paper/historial-precios/${simbolo}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtiene las órdenes pendientes de un trader
+   * GET /api/mercado-colombia/paper/ordenes-comisionista/pendientes?usuarioId={idTrader}
+   * @param idTrader ID del trader
+   */
+  obtenerOrdenesPendientes(idTrader: number): Observable<OrdenComisionista[]> {
+    const params = new HttpParams().set('usuarioId', idTrader.toString());
+    return this.http.get<OrdenComisionista[]>(`${this.baseUrl}/paper/ordenes-comisionista/pendientes`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Acepta una orden de comisionista (ejecuta la compra automáticamente)
+   * POST /api/mercado-colombia/paper/ordenes-comisionista/{ordenId}/aceptar
+   * @param ordenId ID de la orden
+   */
+  aceptarOrdenComisionista(ordenId: number): Observable<RespuestaOrdenComisionista> {
+    return this.http.post<RespuestaOrdenComisionista>(`${this.baseUrl}/paper/ordenes-comisionista/${ordenId}/aceptar`, null)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Rechaza una orden de comisionista
+   * POST /api/mercado-colombia/paper/ordenes-comisionista/{ordenId}/rechazar
+   * @param ordenId ID de la orden
+   */
+  rechazarOrdenComisionista(ordenId: number): Observable<RespuestaOrdenComisionista> {
+    return this.http.post<RespuestaOrdenComisionista>(`${this.baseUrl}/paper/ordenes-comisionista/${ordenId}/rechazar`, null)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtiene una orden específica por su ID
+   * GET /api/ordenes-comisionista/{id}
+   * @param ordenId ID de la orden
+   */
+  obtenerOrdenPorId(ordenId: number): Observable<OrdenComisionista> {
+    return this.http.get<OrdenComisionista>(`http://localhost:8082/api/ordenes-comisionista/${ordenId}`)
+      .pipe(catchError(this.handleError));
   }
 }
 

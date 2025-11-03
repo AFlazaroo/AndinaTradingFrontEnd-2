@@ -35,6 +35,26 @@ export const routes: Routes = [
         path: 'analisis',
         loadComponent: () =>
           import('./dashboard/pages/analisis/analisis.component').then(m => m.AnalisisComponent)
+      },
+      {
+        path: 'portafolio',
+        loadComponent: () =>
+          import('./dashboard/pages/comisionista/portafolio/portafolio.component').then(m => m.PortafolioComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./dashboard/pages/perfil/perfil.component').then(m => m.PerfilComponent)
+      },
+      {
+        path: 'comisionista',
+        loadComponent: () =>
+          import('./dashboard/pages/vincular-comisionista/vincular-comisionista.component').then(m => m.VincularComisionistaComponent)
+      },
+      {
+        path: 'ordenes-pendientes',
+        loadComponent: () =>
+          import('./dashboard/pages/ordenes-pendientes/ordenes-pendientes.component').then(m => m.OrdenesPendientesComponent)
       }
     ]
   },
@@ -46,6 +66,14 @@ export const routes: Routes = [
       {
         path: 'traders',
         loadComponent: () => import('./dashboard/pages/comisionista/traders/traders.component').then(m => m.TradersComponent)
+      },
+      {
+        path: 'enviar-orden',
+        loadComponent: () => import('./dashboard/pages/comisionista/enviar-orden/enviar-orden.component').then(m => m.EnviarOrdenComponent)
+      },
+      {
+        path: 'ordenes-enviadas',
+        loadComponent: () => import('./dashboard/pages/comisionista/ordenes-enviadas/ordenes-enviadas.component').then(m => m.OrdenesEnviadasComponent)
       },
       {
         path: 'portafolio',

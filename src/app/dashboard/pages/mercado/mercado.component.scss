@@ -267,3 +267,46 @@
   }
 }
 
+// Estilos para los headers de países
+.pais-header {
+  border-left: 4px solid #0ca77d;
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+
+  h3 {
+    font-family: 'Alegreya Sans', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+
+    .pais-flag {
+      font-size: 2.5rem;
+      margin-right: 0.75rem;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  p {
+    margin-left: 3.5rem; // Alinear con el texto del título (después de la bandera)
+    font-size: 0.9rem;
+  }
+}
+
+// Colores específicos para badges de países
+.badge.bg-primary {
+  background-color: #ffc107 !important; // Amarillo Colombia
+}
+
+.badge.bg-info {
+  background-color: #17a2b8 !important; // Azul Ecuador
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important; // Rojo Perú
+}
+
+.badge.bg-warning {
+  background-color: #ffc107 !important; // Amarillo Venezuela
+}
+

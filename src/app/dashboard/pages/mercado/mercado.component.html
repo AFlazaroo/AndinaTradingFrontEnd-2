@@ -1,8 +1,8 @@
 <div class="mercado-container p-4">
   <!-- Título -->
   <div class="mb-4">
-    <h2 class="text-white">Mercado Colombiano</h2>
-    <p class="text-muted">Acciones de la Bolsa de Valores de Colombia (BVC)</p>
+    <h2 class="text-white">Mercado Latinoamericano</h2>
+    <p class="text-muted">Acciones de Colombia, Ecuador, Perú y Venezuela</p>
   </div>
 
   <!-- Spinner -->
@@ -38,10 +38,11 @@
             </div>
 
             <div class="precio-info mb-3">
-              <h3 class="text-primary mb-1">{{ accion.precioActual | currency:'COP':'symbol':'1.0-0' }}</h3>
+              <h3 class="text-primary mb-1" *ngIf="tieneDatosPrecio(accion)">{{ formatearPrecio(accion) }}</h3>
+              <h3 class="text-muted mb-1" *ngIf="!tieneDatosPrecio(accion)">N/A</h3>
               <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
-                <i [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
-                {{ getVariacionPorcentual(accion) | number:'1.2-2' }}%
+                <i *ngIf="tieneDatosPrecio(accion)" [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ formatearVariacionPorcentual(accion) }}
               </small>
             </div>
 
@@ -65,23 +66,31 @@
               <small class="text-muted">Gráfico no disponible</small>
             </div>
 
-            <button class="btn btn-success w-100" (click)="abrirModalCompra(accion.simbolo)">
-              <i class="bi bi-cart-plus me-2"></i>Comprar
-            </button>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-info btn-sm flex-fill" (click)="abrirModalHistorialPrecios(accion.simbolo, accion.nombre)">
+                <i class="bi bi-graph-up-arrow me-1"></i>Historial
+              </button>
+              <button class="btn btn-success btn-sm flex-fill" (click)="abrirModalCompra(accion.simbolo)">
+                <i class="bi bi-cart-plus me-1"></i>Comprar
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Todas las Acciones -->
-  <div *ngIf="!loading && acciones.length > 0" class="mb-4">
-    <h4 class="text-white mb-3">
-      <i class="bi bi-graph-up me-2"></i>
-      Todas las Acciones Disponibles
-    </h4>
+  <!-- 🇨🇴 COLOMBIA -->
+  <div *ngIf="!loading && accionesColombia.length > 0" class="mb-5">
+    <div class="pais-header mb-4">
+      <h3 class="text-white">
+        <span class="pais-flag">🇨🇴</span>
+        Colombia
+      </h3>
+      <p class="text-muted">Bolsa de Valores de Colombia (BVC)</p>
+    </div>
     <div class="row">
-      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let accion of acciones">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let accion of accionesColombia">
         <div class="card h-100 shadow-sm text-white accion-card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -89,28 +98,16 @@
                 <h5 class="card-title mb-1">{{ accion.simbolo }}</h5>
                 <small class="text-muted">{{ accion.nombre }}</small>
               </div>
+              <span class="badge bg-primary">Colombia</span>
             </div>
 
             <div class="precio-info mb-3">
-              <h4 class="text-primary mb-1">{{ accion.precioActual | currency:'COP':'symbol':'1.0-0' }}</h4>
+              <h4 class="text-primary mb-1" *ngIf="tieneDatosPrecio(accion)">{{ formatearPrecio(accion) }}</h4>
+              <h4 class="text-muted mb-1" *ngIf="!tieneDatosPrecio(accion)">N/A</h4>
               <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
-                <i [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
-                {{ getVariacionPorcentual(accion) | number:'1.2-2' }}%
+                <i *ngIf="tieneDatosPrecio(accion)" [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ formatearVariacionPorcentual(accion) }}
               </small>
-            </div>
-
-            <!-- Información adicional -->
-            <div class="info-adicional mb-3 small text-muted">
-              <div *ngIf="accion.volumen" class="mb-1">
-                <i class="bi bi-bar-chart me-1"></i>
-                Volumen: {{ accion.volumen | number:'1.0-0' }}
-              </div>
-              <div *ngIf="accion.apertura" class="mb-1">
-                Apertura: {{ accion.apertura | currency:'COP':'symbol':'1.0-0' }}
-              </div>
-              <div *ngIf="accion.maximo && accion.minimo">
-                Rango: {{ accion.minimo | currency:'COP':'symbol':'1.0-0' }} - {{ accion.maximo | currency:'COP':'symbol':'1.0-0' }}
-              </div>
             </div>
 
             <!-- Gráfico compacto -->
@@ -126,11 +123,188 @@
               </iframe>
             </div>
 
-            <!-- Placeholder compacto cuando el gráfico no está disponible -->
+            <!-- Placeholder compacto -->
             <div *ngIf="!deberaMostrarGrafico(accion.simbolo)" class="chart-placeholder-small mb-3">
               <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
               <p class="text-muted small mb-0">{{ accion.simbolo }}</p>
-              <small class="text-muted" style="font-size: 0.7rem;">No disponible</small>
+              <small class="text-muted" style="font-size: 0.7rem;">Gráfico no disponible</small>
+            </div>
+
+            <button class="btn btn-outline-success w-100" (click)="abrirModalCompra(accion.simbolo)">
+              <i class="bi bi-cart-plus me-2"></i>Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🇪🇨 ECUADOR -->
+  <div *ngIf="!loading && accionesEcuador.length > 0" class="mb-5">
+    <div class="pais-header mb-4">
+      <h3 class="text-white">
+        <span class="pais-flag">🇪🇨</span>
+        Ecuador
+      </h3>
+      <p class="text-muted">Bolsa de Valores de Quito y Guayaquil</p>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let accion of accionesEcuador">
+        <div class="card h-100 shadow-sm text-white accion-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">{{ accion.simbolo }}</h5>
+                <small class="text-muted">{{ accion.nombre }}</small>
+              </div>
+              <span class="badge bg-info">Ecuador</span>
+            </div>
+
+            <div class="precio-info mb-3">
+              <h4 class="text-primary mb-1" *ngIf="tieneDatosPrecio(accion)">{{ formatearPrecio(accion) }}</h4>
+              <h4 class="text-muted mb-1" *ngIf="!tieneDatosPrecio(accion)">N/A</h4>
+              <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
+                <i *ngIf="tieneDatosPrecio(accion)" [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ formatearVariacionPorcentual(accion) }}
+              </small>
+            </div>
+
+            <!-- Gráfico compacto para acciones con símbolo NYSE -->
+            <div class="chart-container-small mb-3" *ngIf="deberaMostrarGrafico(accion.simbolo)">
+              <iframe
+                [src]="getChartUrl(accion.simbolo)"
+                width="100%"
+                height="150"
+                frameborder="0"
+                allowtransparency="true"
+                scrolling="no"
+                style="border: none;">
+              </iframe>
+            </div>
+
+            <!-- Placeholder compacto -->
+            <div *ngIf="!deberaMostrarGrafico(accion.simbolo)" class="chart-placeholder-small mb-3">
+              <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
+              <p class="text-muted small mb-0">{{ accion.simbolo }}</p>
+              <small class="text-muted" style="font-size: 0.7rem;">Gráfico no disponible</small>
+            </div>
+
+            <button class="btn btn-outline-success w-100" (click)="abrirModalCompra(accion.simbolo)">
+              <i class="bi bi-cart-plus me-2"></i>Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🇵🇪 PERÚ -->
+  <div *ngIf="!loading && accionesPeru.length > 0" class="mb-5">
+    <div class="pais-header mb-4">
+      <h3 class="text-white">
+        <span class="pais-flag">🇵🇪</span>
+        Perú
+      </h3>
+      <p class="text-muted">Bolsa de Valores de Lima (BVL)</p>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let accion of accionesPeru">
+        <div class="card h-100 shadow-sm text-white accion-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">{{ accion.simbolo }}</h5>
+                <small class="text-muted">{{ accion.nombre }}</small>
+              </div>
+              <span class="badge bg-danger">Perú</span>
+            </div>
+
+            <div class="precio-info mb-3">
+              <h4 class="text-primary mb-1" *ngIf="tieneDatosPrecio(accion)">{{ formatearPrecio(accion) }}</h4>
+              <h4 class="text-muted mb-1" *ngIf="!tieneDatosPrecio(accion)">N/A</h4>
+              <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
+                <i *ngIf="tieneDatosPrecio(accion)" [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ formatearVariacionPorcentual(accion) }}
+              </small>
+            </div>
+
+            <!-- Gráfico compacto para acciones con símbolo NYSE -->
+            <div class="chart-container-small mb-3" *ngIf="deberaMostrarGrafico(accion.simbolo)">
+              <iframe
+                [src]="getChartUrl(accion.simbolo)"
+                width="100%"
+                height="150"
+                frameborder="0"
+                allowtransparency="true"
+                scrolling="no"
+                style="border: none;">
+              </iframe>
+            </div>
+
+            <!-- Placeholder compacto -->
+            <div *ngIf="!deberaMostrarGrafico(accion.simbolo)" class="chart-placeholder-small mb-3">
+              <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
+              <p class="text-muted small mb-0">{{ accion.simbolo }}</p>
+              <small class="text-muted" style="font-size: 0.7rem;">Gráfico no disponible</small>
+            </div>
+
+            <button class="btn btn-outline-success w-100" (click)="abrirModalCompra(accion.simbolo)">
+              <i class="bi bi-cart-plus me-2"></i>Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🇻🇪 VENEZUELA -->
+  <div *ngIf="!loading && accionesVenezuela.length > 0" class="mb-5">
+    <div class="pais-header mb-4">
+      <h3 class="text-white">
+        <span class="pais-flag">🇻🇪</span>
+        Venezuela
+      </h3>
+      <p class="text-muted">Bolsa de Valores de Caracas (BVC)</p>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let accion of accionesVenezuela">
+        <div class="card h-100 shadow-sm text-white accion-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">{{ accion.simbolo }}</h5>
+                <small class="text-muted">{{ accion.nombre }}</small>
+              </div>
+              <span class="badge bg-warning text-dark">Venezuela</span>
+            </div>
+
+            <div class="precio-info mb-3">
+              <h4 class="text-primary mb-1" *ngIf="tieneDatosPrecio(accion)">{{ formatearPrecio(accion) }}</h4>
+              <h4 class="text-muted mb-1" *ngIf="!tieneDatosPrecio(accion)">N/A</h4>
+              <small [ngClass]="getVariacionClass(getVariacionPorcentual(accion))">
+                <i *ngIf="tieneDatosPrecio(accion)" [class]="getVariacionPorcentual(accion) >= 0 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+                {{ formatearVariacionPorcentual(accion) }}
+              </small>
+            </div>
+
+            <!-- Gráfico compacto (ninguna acción venezolana tiene gráfico) -->
+            <div class="chart-container-small mb-3" *ngIf="deberaMostrarGrafico(accion.simbolo)">
+              <iframe
+                [src]="getChartUrl(accion.simbolo)"
+                width="100%"
+                height="150"
+                frameborder="0"
+                allowtransparency="true"
+                scrolling="no"
+                style="border: none;">
+              </iframe>
+            </div>
+
+            <!-- Placeholder compacto -->
+            <div *ngIf="!deberaMostrarGrafico(accion.simbolo)" class="chart-placeholder-small mb-3">
+              <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
+              <p class="text-muted small mb-0">{{ accion.simbolo }}</p>
+              <small class="text-muted" style="font-size: 0.7rem;">Gráfico no disponible</small>
             </div>
 
             <button class="btn btn-outline-success w-100" (click)="abrirModalCompra(accion.simbolo)">
@@ -154,3 +328,9 @@
   [symbol]="symbolSeleccionado"
   (confirmar)="onConfirmarCompra($event)">
 </app-modal-compra>
+
+<!-- Modal de historial de precios -->
+<app-modal-historial-precios
+  [simbolo]="simboloHistorial"
+  [nombreEmpresa]="nombreEmpresaHistorial">
+</app-modal-historial-precios>

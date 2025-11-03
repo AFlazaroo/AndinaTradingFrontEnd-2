@@ -26,33 +26,37 @@
           <thead>
             <tr>
               <th><i class="bi bi-tag me-2"></i>Símbolo</th>
-              <th><i class="bi bi-building me-2"></i>Empresa</th>
               <th><i class="bi bi-arrow-left-right me-2"></i>Tipo</th>
               <th><i class="bi bi-hash me-2"></i>Cantidad</th>
-              <th><i class="bi bi-currency-dollar me-2"></i>Precio</th>
-              <th><i class="bi bi-calculator me-2"></i>Total</th>
+              <th><i class="bi bi-currency-dollar me-2"></i>Precio Unit.</th>
+              <th><i class="bi bi-calculator me-2"></i>Monto Total</th>
+              <th><i class="bi bi-wallet2 me-2"></i>Comisión</th>
+              <th><i class="bi bi-arrow-down-circle me-2"></i>Balance Anterior</th>
+              <th><i class="bi bi-arrow-up-circle me-2"></i>Balance Posterior</th>
               <th><i class="bi bi-calendar me-2"></i>Fecha</th>
-              <th><i class="bi bi-info-circle me-2"></i>Estado</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let transaccion of transacciones">
               <td class="fw-bold">{{ transaccion.simbolo }}</td>
-              <td>{{ transaccion.nombreEmpresa }}</td>
               <td>
-                <span class="badge" [ngClass]="transaccion.tipoTransaccion === 'COMPRA' ? 'bg-success' : 'bg-danger'">
-                  <i [class]="getIconoTipo(transaccion.tipoTransaccion)" class="me-1"></i>
-                  {{ transaccion.tipoTransaccion }}
+                <span class="badge" [ngClass]="transaccion.tipo === 'COMPRA' ? 'bg-success' : 'bg-danger'">
+                  <i [class]="getIconoTipo(transaccion.tipo)" class="me-1"></i>
+                  {{ transaccion.tipo }}
                 </span>
               </td>
               <td>{{ transaccion.cantidad }}</td>
-              <td>{{ transaccion.precio | currency:'USD':'symbol':'1.2-2' }}</td>
-              <td class="fw-bold">{{ transaccion.total | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td>{{ transaccion.precioUnitario | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="fw-bold" [ngClass]="transaccion.tipo === 'COMPRA' ? 'text-danger' : 'text-success'">
+                {{ transaccion.montoTotal | currency:'USD':'symbol':'1.2-2' }}
+              </td>
+              <td class="text-muted">
+                <small>{{ transaccion.comision | currency:'USD':'symbol':'1.2-2' }}</small>
+              </td>
+              <td>{{ transaccion.balanceAnterior | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td>{{ transaccion.balancePosterior | currency:'USD':'symbol':'1.2-2' }}</td>
               <td>
                 <small>{{ transaccion.fechaTransaccion | date:'short' }}</small>
-              </td>
-              <td>
-                <span class="badge bg-info">{{ transaccion.estado || 'COMPLETADA' }}</span>
               </td>
             </tr>
           </tbody>

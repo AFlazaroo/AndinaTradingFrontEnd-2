@@ -1,137 +1,170 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { MercadoColombiaService } from '../../../../services/mercado-colombia/mercado-colombia.service';
+import { PosicionPaper, ResumenPortafolio } from '../../../../models/paper-trading.model';
+import { ModalVentaComponent } from '../../modals/modal-venta/modal-venta.component';
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-portafolio',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="container">
-      <h2 class="mb-4">Portafolio de Clientes</h2>
-      
-      <!-- Resumen Total -->
-      <div class="row mb-4">
-        <div class="col-md-4">
-          <div class="card summary-card">
-            <div class="card-body">
-              <h5 class="card-title">Valor Total</h5>
-              <h3 class="card-value">{{ valorTotal | currency:'USD' }}</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card summary-card">
-            <div class="card-body">
-              <h5 class="card-title">Clientes Activos</h5>
-              <h3 class="card-value">{{ clientesActivos }}</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card summary-card">
-            <div class="card-body">
-              <h5 class="card-title">Operaciones Hoy</h5>
-              <h3 class="card-value">{{ operacionesHoy }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabla de Portafolios -->
-      <div class="card">
-        <div class="card-body">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Valor Portafolio</th>
-                <th>Rendimiento</th>
-                <th>Última Operación</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let portafolio of portafolios">
-                <td>{{ portafolio.cliente }}</td>
-                <td>{{ portafolio.valor | currency:'USD' }}</td>
-                <td [ngClass]="portafolio.rendimiento >= 0 ? 'text-success' : 'text-danger'">
-                  {{ portafolio.rendimiento }}%
-                </td>
-                <td>{{ portafolio.ultimaOperacion | date:'short' }}</td>
-                <td>
-                  <button class="btn btn-sm btn-primary me-2">Ver Detalles</button>
-                  <button class="btn btn-sm btn-info">Ver Historial</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .container {
-      padding: 2rem;
-    }
-    .card {
-      background-color: #1a1d2e;
-      border: none;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-    }
-    .summary-card {
-      text-align: center;
-      .card-title {
-        color: #ccc;
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-      }
-      .card-value {
-        color: #0CA77D;
-        font-size: 2rem;
-        margin: 0;
-      }
-    }
-    .table {
-      color: white;
-    }
-    .text-success {
-      color: #0CA77D !important;
-    }
-    .text-danger {
-      color: #dc3545 !important;
-    }
-  `]
+  imports: [CommonModule, RouterModule, ModalVentaComponent],
+  templateUrl: './portafolio.component.html',
+  styleUrls: ['./portafolio.component.scss']
 })
 export class PortafolioComponent implements OnInit {
-  valorTotal: number = 1500000;
-  clientesActivos: number = 25;
-  operacionesHoy: number = 12;
+  posiciones: PosicionPaper[] = [];
+  resumen: ResumenPortafolio | null = null;
+  loading: boolean = true;
+  errorMessage: string = '';
+  
+  // Datos para el modal de venta
+  simboloSeleccionado: string = '';
+  nombreEmpresaSeleccionada: string = '';
+  cantidadDisponible: number = 0;
+  precioActualSeleccionado: number = 0;
 
-  portafolios: any[] = [
-    {
-      cliente: 'Juan Pérez',
-      valor: 75000,
-      rendimiento: 5.2,
-      ultimaOperacion: new Date()
-    },
-    {
-      cliente: 'María García',
-      valor: 125000,
-      rendimiento: -2.1,
-      ultimaOperacion: new Date()
-    },
-    {
-      cliente: 'Carlos López',
-      valor: 95000,
-      rendimiento: 3.8,
-      ultimaOperacion: new Date()
-    }
-  ];
+  @ViewChild(ModalVentaComponent) modalVenta!: ModalVentaComponent;
 
-  constructor() {}
+  constructor(private mercadoService: MercadoColombiaService) {}
 
   ngOnInit(): void {
-    // Aquí cargarías los datos reales desde el backend
+    this.cargarPosiciones();
   }
-} 
+
+  cargarPosiciones(): void {
+    // Obtener el usuarioId del localStorage
+    const usuarioId = Number(localStorage.getItem('usuarioId') || localStorage.getItem('idUsuario'));
+    
+    console.log('📋 Cargando portafolio para usuario:', usuarioId);
+    
+    if (!usuarioId) {
+      this.errorMessage = 'Usuario no autenticado. Por favor, inicia sesión.';
+      this.loading = false;
+      console.error('❌ No se encontró usuarioId en localStorage');
+      return;
+    }
+
+    this.loading = true;
+    
+    // Cargar resumen del portafolio
+    this.mercadoService.getResumenPortafolio(usuarioId).subscribe({
+      next: (resumenData) => {
+        console.log('✅ Resumen del portafolio recibido:', resumenData);
+        this.resumen = resumenData;
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar resumen:', err);
+      }
+    });
+
+    // Cargar posiciones detalladas
+    this.mercadoService.getPosicionesUsuario(usuarioId).subscribe({
+      next: (data) => {
+        console.log('✅ Posiciones recibidas:', data);
+        this.posiciones = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar posiciones:', err);
+        this.errorMessage = 'Error al cargar tus posiciones';
+        this.loading = false;
+      }
+    });
+  }
+
+  abrirModalVenta(posicion: PosicionPaper): void {
+    this.simboloSeleccionado = posicion.simbolo;
+    this.nombreEmpresaSeleccionada = posicion.nombreEmpresa;
+    this.cantidadDisponible = posicion.cantidad;
+    // Calcular precio actual desde valorMercadoActual / cantidad
+    this.precioActualSeleccionado = posicion.cantidad > 0 
+      ? posicion.valorMercadoActual / posicion.cantidad 
+      : posicion.precioPromedio;
+
+    // Usar setTimeout para asegurar que el modal se configure después del cambio de detección
+    setTimeout(() => {
+      if (this.modalVenta) {
+        this.modalVenta.symbol = this.simboloSeleccionado;
+        this.modalVenta.nombreEmpresa = this.nombreEmpresaSeleccionada;
+        this.modalVenta.cantidadDisponible = this.cantidadDisponible;
+        this.modalVenta.precioActual = this.precioActualSeleccionado;
+        this.modalVenta.open();
+      }
+    }, 0);
+  }
+
+  onConfirmarVenta(datos: { cantidad: number }): void {
+    const usuarioId = Number(localStorage.getItem('usuarioId') || localStorage.getItem('idUsuario'));
+    
+    console.log('🔍 Datos de venta:', {
+      usuarioId,
+      simbolo: this.simboloSeleccionado,
+      cantidad: datos.cantidad,
+      nota: 'El precio se obtendrá automáticamente del mercado en tiempo real'
+    });
+
+    if (!usuarioId || datos.cantidad < 1) {
+      alert('Datos inválidos para la venta');
+      console.error('❌ Validación fallida:', { usuarioId, cantidad: datos.cantidad });
+      return;
+    }
+
+    this.loading = true;
+    this.mercadoService.venderAccionesPaper(
+      usuarioId,
+      this.simboloSeleccionado,
+      datos.cantidad
+    ).subscribe({
+      next: (mensaje) => {
+        this.loading = false;
+        console.log('✅ Venta exitosa:', mensaje);
+        alert(`✅ Venta exitosa!\n\n${mensaje}`);
+        // Recargar posiciones y resumen después de la venta
+        this.cargarPosiciones();
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('❌ Error en la venta:', err);
+        
+        let errorMsg = 'Error desconocido';
+        if (err.error && typeof err.error === 'string') {
+          errorMsg = err.error;
+        } else if (err.message) {
+          errorMsg = err.message;
+        }
+        
+        alert(`❌ Error en la venta:\n\n${errorMsg}`);
+      }
+    });
+  }
+
+  getColorGanancia(ganancia: number): string {
+    if (ganancia > 0) return 'text-success';
+    if (ganancia < 0) return 'text-danger';
+    return 'text-muted';
+  }
+
+  getIconoGanancia(ganancia: number): string {
+    if (ganancia > 0) return 'bi-arrow-up-circle';
+    if (ganancia < 0) return 'bi-arrow-down-circle';
+    return 'bi-dash-circle';
+  }
+
+  get valorTotalPortafolio(): number {
+    return this.resumen?.valorTotal || 0;
+  }
+
+  get gananciaPerdidaTotal(): number {
+    return this.resumen?.gananciaPerdida || 0;
+  }
+
+  get porcentajeGananciaPerdida(): number {
+    return this.resumen?.porcentaje || 0;
+  }
+
+  get estadoPortafolio(): string {
+    return this.resumen?.estado || 'NEUTRO';
+  }
+}

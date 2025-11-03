@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans&display=swap');
+
+.portafolio-container {
+  background-color: #000218;
+  min-height: 100vh;
+  font-family: 'Alegreya Sans', sans-serif;
+}
+
+.card {
+  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  border-radius: 15px;
+  border: none;
+  color: white;
+}
+
+.summary-card {
+  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(12, 167, 125, 0.3);
+  }
+
+  .card-title {
+    color: #ccc;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .card-value {
+    color: #0CA77D;
+    font-size: 2rem;
+    margin: 0;
+    font-weight: bold;
+  }
+}
+
+.table {
+  color: white;
+  background-color: transparent;
+
+  thead {
+    background-color: rgba(12, 167, 125, 0.1);
+    
+    th {
+      color: #fff;
+      font-weight: 600;
+      border-bottom: 2px solid #0ca77d;
+      padding: 1rem;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(12, 167, 125, 0.1);
+      }
+
+      td {
+        padding: 1rem;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.text-success {
+  color: #0CA77D !important;
+  font-weight: 600;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  border: none;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c82333, #dc3545);
+    transform: scale(1.05);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  border: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
+    transform: scale(1.05);
+  }
+}
+

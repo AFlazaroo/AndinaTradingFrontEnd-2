@@ -1,0 +1,125 @@
+<div class="modal fade" id="modalHistorialPrecios" tabindex="-1" aria-labelledby="modalHistorialPreciosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalHistorialPreciosLabel">
+          <i class="bi bi-graph-up-arrow me-2"></i>
+          Historial de Precios - {{ nombreEmpresa || simbolo }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Error -->
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Spinner -->
+        <div *ngIf="loading" class="text-center my-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="text-white mt-3">Cargando historial de precios...</p>
+        </div>
+
+        <!-- Gráfico -->
+        <div *ngIf="!loading && historial && historial.datos && historial.datos.length > 0">
+          <!-- Resumen de información -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="info-card">
+                <div class="info-label">Precio Inicial</div>
+                <div class="info-value">${{ getPrecioInicial().toFixed(2) }}</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="info-card">
+                <div class="info-label">Precio Actual</div>
+                <div class="info-value">${{ getPrecioActual().toFixed(2) }}</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="info-card">
+                <div class="info-label">Variación</div>
+                <div class="info-value" [ngClass]="getVariacionPercentual() >= 0 ? 'text-success' : 'text-danger'">
+                  {{ getVariacionPercentual() >= 0 ? '+' : '' }}{{ getVariacionPercentual().toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="info-card">
+                <div class="info-label">Período</div>
+                <div class="info-value small">{{ historial.periodo }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico ApexCharts -->
+          <div class="chart-container">
+            <apx-chart
+              [series]="chartOptions.series!"
+              [chart]="chartOptions.chart!"
+              [dataLabels]="chartOptions.dataLabels!"
+              [stroke]="chartOptions.stroke!"
+              [title]="chartOptions.title!"
+              [subtitle]="chartOptions.subtitle!"
+              [grid]="chartOptions.grid!"
+              [xaxis]="chartOptions.xaxis!"
+              [yaxis]="chartOptions.yaxis!"
+              [legend]="chartOptions.legend!"
+              [tooltip]="chartOptions.tooltip!"
+              [colors]="chartOptions.colors!">
+            </apx-chart>
+          </div>
+
+          <!-- Tabla de datos -->
+          <div class="mt-4">
+            <h6 class="text-white mb-3">
+              <i class="bi bi-table me-2"></i>
+              Datos Detallados
+            </h6>
+            <div class="table-responsive">
+              <table class="table table-dark table-hover">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Apertura</th>
+                    <th>Máximo</th>
+                    <th>Mínimo</th>
+                    <th>Cierre</th>
+                    <th>Volumen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let punto of historial.datos">
+                    <td>{{ formatearFecha(punto.fecha) }}</td>
+                    <td>${{ punto.precioApertura.toFixed(2) }}</td>
+                    <td class="text-success">${{ punto.precioMaximo.toFixed(2) }}</td>
+                    <td class="text-danger">${{ punto.precioMinimo.toFixed(2) }}</td>
+                    <td class="fw-bold">${{ punto.precioCierre.toFixed(2) }}</td>
+                    <td>{{ punto.volumen.toLocaleString() }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sin datos -->
+        <div *ngIf="!loading && (!historial || !historial.datos || historial.datos.length === 0)" class="text-center py-5">
+          <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+          <p class="text-muted">No hay datos históricos disponibles para este símbolo</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-2"></i>
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

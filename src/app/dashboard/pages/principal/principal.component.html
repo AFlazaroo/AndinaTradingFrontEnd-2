@@ -1,20 +1,16 @@
 <div class="container-fluid dashboard-container">
   <div class="container-fluid px-lg-5 px-md-4 px-3">
     <div class="d-flex align-items-center justify-content-between">
-  <h2 class="dashboard-title">Dashboard Principal</h2>
-  
-</div>
+      <h2 class="dashboard-title">Dashboard Principal</h2>
+    </div>
     <div class="title-underline"></div>
 
-
-<p class="welcome-message">
-  {{ getSaludo() }}, {{ nombreCompleto }} 👋  
-</p>
-<p class="sub-welcome-message">
-  {{ getMensajePortafolio() }}
-</p>
-
-
+    <p class="welcome-message">
+      {{ getSaludo() }}, {{ nombreCompleto }} 👋  
+    </p>
+    <p class="sub-welcome-message">
+      {{ getMensajePortafolio() }}
+    </p>
 
     <div class="info-top-bar d-flex justify-content-end align-items-center gap-4 mb-4">
       <div class="clock text-white d-flex align-items-center">
@@ -25,102 +21,181 @@
       </div>
     </div>
 
-    <!-- Valor del portafolio -->
-    <div class="portfolio-value-box d-flex justify-content-between align-items-center mb-5">
-      <div>
-        <p class="portfolio-label">
-  <i class="bi bi-briefcase-fill me-2 text-primary"></i>
-  Valor del portafolio
-</p>
-<h1 class="portfolio-amount">
-  <span class="currency-label">USD - $</span> {{ valorPortafolio | number:'1.0-0' }}
-</h1>
-<h1 class="portfolio-amount">
-  <span class="currency-label">COP - $</span> {{ valorPortafolio * 3850 | number:'1.0-0' }}
-</h1>
+    <!-- Spinner -->
+    <div *ngIf="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
       </div>
-      <img src="assets/line.png" alt="Gráfica" width="200" height="200" />
+      <p class="text-white mt-3">Cargando tu portafolio...</p>
     </div>
 
-    <!-- Tablas -->
-    <div class="row g-4">
-      <!-- Holdings -->
-      <div class="col-12 col-lg-6 d-flex">
-        <div class="data-box flex-fill">
-          <h5 class="table-title mb-3 d-flex justify-content-between align-items-center">
-  <span>
-    <i class="bi bi-pie-chart-fill me-2 text-info"></i> Holdings
-  </span>
-  <span class="total-holdings-value" (click)="alternarMoneda()" style="cursor: pointer;">
-    {{ mostrarEnCOP
-      ? (valorTotalHoldings * 3850 | currency:'COP  -   $':'symbol':'1.0-0')
-      : (valorTotalHoldings | currency:'USD  -   $':'symbol':'1.0-0') }}
-  </span>
-</h5>
-          <div class="table-responsive">
-            <table class="table table-borderless holdings-table">
-              <thead>
-                <tr>
-                  <th>Acción</th>
-                  <th>Cantidad</th>
-                  <th>Precio</th>
-                  <th>Valor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let holding of holdings">
-                  <td>
-                    <strong>{{ holding.accion }}</strong><br />
-                    <small style="color: #7B7566;">{{ holding.nombreCompania }}</small>
-                  </td>
-                  <td>{{ holding.cantidad }}</td>
-                  <td>{{ holding.precio_actual | currency: 'USD' }}</td>
-                  <td>{{ holding.precio_actual * holding.cantidad | currency: 'USD' }}</td>
-                </tr>
-              </tbody>
-            </table>
+    <!-- Resumen del Portafolio -->
+    <div *ngIf="!loading && resumen" class="row mb-4">
+      <!-- Balance Inicial -->
+      <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-wallet2 me-2"></i>
+              Balance Inicial
+            </h5>
+            <h3 class="card-value">{{ balanceInicial | currency:'USD':'symbol':'1.2-2' }}</h3>
           </div>
         </div>
       </div>
 
-      <!-- Operaciones -->
-      <div class="col-12 col-lg-6 d-flex">
-  <div class="data-box flex-fill">
-   <h5 class="table-title mb-3">
-  <i class="bi bi-clock-history me-2 icon-historial"></i>
-  Historial de operaciones
-</h5>
-    <div class="table-responsive">
-      <table class="table table-borderless operations-table text-center">
-        <thead>
-          <tr>
-            <th>Acción</th>
-            <th>Tipo</th>
-            <th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-  *ngFor="let operacion of operaciones"
-  [ngClass]="{
-    'row-compra': operacion.tipo.toLowerCase() === 'compra',
-    'row-venta': operacion.tipo.toLowerCase() === 'venta'
-  }"
->
-            <td>{{ operacion.accion }}</td>
-            <td [ngClass]="{
-                  'text-success': operacion.tipo === 'Compra',
-                  'text-danger': operacion.tipo === 'Venta'
-                }">
-              {{ operacion.tipo === 'compra' ? 'Compra' : 'Venta' }}
-            </td>
-            <td>{{ operacion.fecha }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Balance Disponible -->
+      <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-cash-stack me-2"></i>
+              Balance Disponible
+            </h5>
+            <h3 class="card-value text-info">{{ balanceDisponible | currency:'USD':'symbol':'1.2-2' }}</h3>
+            <p class="text-muted mb-0 small">(efectivo)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Valor Invertido -->
+      <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-box-seam me-2"></i>
+              Valor Invertido
+            </h5>
+            <h3 class="card-value">{{ valorInvertido | currency:'USD':'symbol':'1.2-2' }}</h3>
+            <p class="text-muted mb-0 small">(en acciones)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Valor Total Portafolio -->
+      <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-briefcase-fill me-2"></i>
+              Valor Total
+            </h5>
+            <h3 class="card-value text-primary">{{ valorTotal | currency:'USD':'symbol':'1.2-2' }}</h3>
+            <p class="text-muted mb-0 small">(total del portafolio)</p>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+
+    <!-- Estadísticas Adicionales -->
+    <div *ngIf="!loading && resumen" class="row mb-4">
+      <!-- Ganancia/Pérdida -->
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-graph-up-arrow me-2"></i>
+              Ganancia/Pérdida
+            </h5>
+            <h3 [ngClass]="getColorGanancia(gananciaPerdida)" class="card-value">
+              <i [class]="getIconoGanancia(gananciaPerdida)" class="me-2"></i>
+              {{ gananciaPerdida | currency:'USD':'symbol':'1.2-2' }}
+            </h3>
+            <p [ngClass]="getColorGanancia(gananciaPerdida)" class="mb-1">
+              {{ porcentajeGananciaPerdida | number:'1.2-2' }}%
+            </p>
+            <span 
+              class="badge" 
+              [ngClass]="{
+                'bg-success': estado === 'GANANDO',
+                'bg-danger': estado === 'PERDIENDO',
+                'bg-secondary': estado === 'NEUTRO'
+              }">
+              {{ estado }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Acciones -->
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-hash me-2"></i>
+              Total de Acciones
+            </h5>
+            <h3 class="card-value">{{ totalAcciones | number:'1.0-0' }}</h3>
+            <p class="text-muted mb-0">acciones</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cantidad de Empresas -->
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card summary-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">
+              <i class="bi bi-building me-2"></i>
+              Cantidad de Empresas
+            </h5>
+            <h3 class="card-value">{{ cantidadEmpresas }}</h3>
+            <p class="text-muted mb-0">posiciones</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Posiciones -->
+    <div *ngIf="!loading && resumen" class="row g-4">
+      <div class="col-12">
+        <div class="data-box flex-fill">
+          <h5 class="table-title mb-3">
+            <i class="bi bi-list-ul me-2 text-info"></i>
+            Detalle de Posiciones
+          </h5>
+          <div class="table-responsive">
+            <table class="table table-borderless holdings-table">
+              <thead>
+                <tr>
+                  <th>Símbolo</th>
+                  <th>Nombre de Empresa</th>
+                  <th>Cantidad</th>
+                  <th>Precio Promedio</th>
+                  <th>Valor Actual</th>
+                  <th>Ganancia/Pérdida</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let posicion of posiciones">
+                  <td>
+                    <strong>{{ posicion.simbolo }}</strong>
+                  </td>
+                  <td>
+                    <small style="color: #7B7566;">{{ posicion.nombreEmpresa }}</small>
+                  </td>
+                  <td>{{ posicion.cantidad }}</td>
+                  <td>{{ posicion.precioPromedio | currency:'USD':'symbol':'1.2-2' }}</td>
+                  <td>{{ posicion.valorMercadoActual | currency:'USD':'symbol':'1.2-2' }}</td>
+                  <td [ngClass]="getColorGanancia(posicion.gananciaPerdida)">
+                    <i [class]="getIconoGanancia(posicion.gananciaPerdida)" class="me-1"></i>
+                    {{ posicion.gananciaPerdida | currency:'USD':'symbol':'1.2-2' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Sin posiciones -->
+          <div *ngIf="posiciones.length === 0" class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+            <p class="text-muted mt-3">No tienes posiciones en tu portafolio</p>
+            <a routerLink="/dashboard/mercado" class="btn btn-primary mt-2">
+              <i class="bi bi-cart-plus me-2"></i>Ir al Mercado
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

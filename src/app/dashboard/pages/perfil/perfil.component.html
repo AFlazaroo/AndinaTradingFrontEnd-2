@@ -1,0 +1,190 @@
+<div class="perfil-container p-4">
+  <div class="mb-4">
+    <h2 class="text-white">
+      <i class="bi bi-person-circle me-2"></i>
+      Gestión de Perfil
+    </h2>
+    <p class="text-muted">Administra tu información personal</p>
+  </div>
+
+  <!-- Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white mt-3">Cargando tu perfil...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Success -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Formulario de Perfil -->
+  <div *ngIf="!loading && perfil" class="card">
+    <div class="card-body p-4">
+      <!-- Información de solo lectura -->
+      <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+          <div class="info-item">
+            <label class="info-label">
+              <i class="bi bi-hash me-2"></i>
+              ID de Usuario
+            </label>
+            <p class="info-value">{{ perfil.idUsuario }}</p>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="info-item">
+            <label class="info-label">
+              <i class="bi bi-person-badge me-2"></i>
+              Rol
+            </label>
+            <p class="info-value">
+              <span class="badge bg-primary">{{ perfil.rol }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="info-item">
+            <label class="info-label">
+              <i class="bi bi-toggle-on me-2"></i>
+              Estado
+            </label>
+            <p class="info-value">
+              <span class="badge" [ngClass]="getEstadoBadge()">{{ getEstadoTexto() }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Formulario editable -->
+      <form [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()">
+        <div class="row">
+          <!-- Nombre -->
+          <div class="col-md-6 mb-3">
+            <label for="nombre" class="form-label">
+              <i class="bi bi-person me-2"></i>
+              Nombre <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              formControlName="nombre"
+              class="form-control"
+              [class.is-invalid]="getCampoInvalido('nombre')"
+              placeholder="Ingresa tu nombre" />
+            <div *ngIf="getCampoInvalido('nombre')" class="invalid-feedback">
+              {{ getMensajeError('nombre') }}
+            </div>
+          </div>
+
+          <!-- Apellido -->
+          <div class="col-md-6 mb-3">
+            <label for="apellido" class="form-label">
+              <i class="bi bi-person me-2"></i>
+              Apellido <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="apellido"
+              formControlName="apellido"
+              class="form-control"
+              [class.is-invalid]="getCampoInvalido('apellido')"
+              placeholder="Ingresa tu apellido" />
+            <div *ngIf="getCampoInvalido('apellido')" class="invalid-feedback">
+              {{ getMensajeError('apellido') }}
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-md-6 mb-3">
+            <label for="email" class="form-label">
+              <i class="bi bi-envelope me-2"></i>
+              Email <span class="text-danger">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              [class.is-invalid]="getCampoInvalido('email')"
+              placeholder="correo@ejemplo.com" />
+            <div *ngIf="getCampoInvalido('email')" class="invalid-feedback">
+              {{ getMensajeError('email') }}
+            </div>
+            <small class="text-muted">El email debe ser único en el sistema</small>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="col-md-6 mb-3">
+            <label for="telefono" class="form-label">
+              <i class="bi bi-telephone me-2"></i>
+              Teléfono <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="telefono"
+              formControlName="telefono"
+              class="form-control"
+              [class.is-invalid]="getCampoInvalido('telefono')"
+              placeholder="3001234567"
+              maxlength="10" />
+            <div *ngIf="getCampoInvalido('telefono')" class="invalid-feedback">
+              {{ getMensajeError('telefono') }}
+            </div>
+            <small class="text-muted">10 dígitos numéricos</small>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button
+            *ngIf="!modoEdicion"
+            type="button"
+            class="btn btn-primary"
+            (click)="activarEdicion()">
+            <i class="bi bi-pencil me-2"></i>
+            Editar Perfil
+          </button>
+          
+          <div *ngIf="modoEdicion" class="d-flex gap-2">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="cancelarEdicion()"
+              [disabled]="guardando">
+              <i class="bi bi-x-circle me-2"></i>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              [disabled]="perfilForm.invalid || guardando">
+              <span *ngIf="!guardando">
+                <i class="bi bi-check-circle me-2"></i>
+                Guardar Cambios
+              </span>
+              <span *ngIf="guardando">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Guardando...
+              </span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

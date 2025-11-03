@@ -1,75 +1,85 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ComisionistasService } from '../../../../services/comisionistas/comisionistas.service';
+import { TraderAsociado } from '../../../../models/trader.model';
 
 @Component({
   selector: 'app-traders',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="container">
-      <h2 class="mb-4">Traders Asociados</h2>
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let trader of traders">
-                    <td>{{ trader.nombre }}</td>
-                    <td>{{ trader.email }}</td>
-                    <td>
-                      <span class="badge" [ngClass]="trader.activo ? 'bg-success' : 'bg-danger'">
-                        {{ trader.activo ? 'Activo' : 'Inactivo' }}
-                      </span>
-                    </td>
-                    <td>
-                      <button class="btn btn-sm btn-primary me-2">Ver Detalles</button>
-                      <button class="btn btn-sm btn-info">Ver Portafolio</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .container {
-      padding: 2rem;
-    }
-    .card {
-      background-color: #1a1d2e;
-      border: none;
-      border-radius: 10px;
-    }
-    .table {
-      color: white;
-    }
-    .badge {
-      padding: 0.5em 1em;
-    }
-  `]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './traders.component.html',
+  styleUrls: ['./traders.component.scss']
 })
 export class TradersComponent implements OnInit {
-  traders: any[] = [
-    { nombre: 'Juan Pérez', email: 'juan@example.com', activo: true },
-    { nombre: 'María García', email: 'maria@example.com', activo: true },
-    { nombre: 'Carlos López', email: 'carlos@example.com', activo: false }
-  ];
+  traders: TraderAsociado[] = [];
+  loading: boolean = true;
+  errorMessage: string = '';
+  traderSeleccionado: TraderAsociado | null = null;
 
-  constructor() {}
+  constructor(private comisionistasService: ComisionistasService) {}
 
   ngOnInit(): void {
-    // Aquí cargarías los datos reales desde el backend
+    this.cargarTradersAsociados();
+  }
+
+  cargarTradersAsociados(): void {
+    // Obtener el ID del comisionista logueado desde localStorage
+    const idComisionista = Number(localStorage.getItem('usuarioId') || localStorage.getItem('idUsuario'));
+    
+    if (!idComisionista) {
+      this.errorMessage = 'No se encontró el ID del comisionista. Por favor, inicia sesión nuevamente.';
+      this.loading = false;
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    console.log('📋 Cargando traders asociados para comisionista ID:', idComisionista);
+
+    this.comisionistasService.obtenerTradersAsociados(idComisionista).subscribe({
+      next: (data) => {
+        console.log('✅ Traders asociados recibidos:', data);
+        this.traders = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar traders asociados:', err);
+        this.errorMessage = 'Error al cargar la lista de traders asociados';
+        this.loading = false;
+      }
+    });
+  }
+
+  verDetalles(trader: TraderAsociado): void {
+    this.traderSeleccionado = trader;
+  }
+
+  cerrarDetalles(): void {
+    this.traderSeleccionado = null;
+  }
+
+  getNombreCompleto(trader: TraderAsociado): string {
+    return `${trader.nombre} ${trader.apellido}`;
+  }
+
+  getEstadoBadgeClass(estado: boolean): string {
+    return estado ? 'bg-success' : 'bg-danger';
+  }
+
+  getEstadoTexto(estado: boolean): string {
+    return estado ? 'Activo' : 'Inactivo';
+  }
+
+  /**
+   * Obtiene la URL de la imagen del trader
+   * Asigna imágenes de forma determinística basada en el ID
+   * Alterna entre 1h.jpg, 2h.jpg, 3m.jpg, 4m.jpg
+   */
+  getImagenTrader(trader: TraderAsociado): string {
+    const imagenIndex = trader.id % 4;
+    const imagenes = ['1h.jpg', '2h.jpg', '3m.jpg', '4m.jpg'];
+    return `assets/${imagenes[imagenIndex]}`;
   }
 } 

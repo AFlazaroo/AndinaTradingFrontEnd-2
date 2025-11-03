@@ -53,3 +53,28 @@ export interface Orden {
   cantidad: number;
   precio: number;
 }
+
+/**
+ * Modelo para el perfil del usuario
+ * Endpoint: GET /usuarios/perfil/{idUsuario}
+ */
+export interface PerfilUsuario {
+  idUsuario: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono: string;
+  rol: string;
+  estado: boolean;
+}
+
+/**
+ * Modelo para actualizar el perfil del usuario
+ * Endpoint: PUT /usuarios/perfil/{idUsuario}
+ */
+export interface ActualizarPerfilRequest {
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono: string;
+}

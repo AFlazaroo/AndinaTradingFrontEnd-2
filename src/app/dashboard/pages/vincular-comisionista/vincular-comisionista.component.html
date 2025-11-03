@@ -1,0 +1,232 @@
+<div class="vincular-comisionista-container p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="text-white mb-2">
+        <i class="bi bi-person-plus me-2"></i>
+        Vincular con Comisionista
+      </h2>
+      <p class="text-muted">Selecciona un comisionista para vincular tu cuenta</p>
+    </div>
+    <div class="form-check form-switch">
+      <input 
+        class="form-check-input" 
+        type="checkbox" 
+        id="soloActivos"
+        [(ngModel)]="soloActivos"
+        (change)="toggleSoloActivos()">
+      <label class="form-check-label text-white" for="soloActivos">
+        Solo Activos
+      </label>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Success -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Información -->
+  <div class="alert alert-info mb-4" role="alert">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>¿Qué significa vincularse?</strong> Al vincular tu cuenta con un comisionista, podrás realizar operaciones a través de él. 
+    Solo puedes vincularte a comisionistas que estén activos.
+  </div>
+
+  <!-- Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white mt-3">Cargando comisionistas disponibles...</p>
+  </div>
+
+  <!-- Tarjetas de Comisionistas -->
+  <div *ngIf="!loading" class="row g-4">
+    <div *ngIf="comisionistas.length === 0" class="col-12">
+      <div class="card text-center">
+        <div class="card-body py-5">
+          <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+          <p class="text-muted mb-0">No hay comisionistas disponibles</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngFor="let comisionista of comisionistas" class="col-md-6 col-lg-4">
+      <div class="card comisionista-card h-100">
+        <div class="card-body">
+          <!-- Imagen del Comisionista -->
+          <div class="text-center mb-3">
+            <img 
+              [src]="getImagenComisionista(comisionista)" 
+              [alt]="getNombreCompleto(comisionista)"
+              class="comisionista-imagen"
+              onerror="this.src='assets/icon.png'">
+          </div>
+
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="flex-grow-1">
+              <h5 class="card-title mb-1">
+                <i class="bi bi-person-badge me-2"></i>
+                {{ getNombreCompleto(comisionista) }}
+              </h5>
+              <p class="text-muted small mb-0">ID: {{ comisionista.id }}</p>
+            </div>
+            <span class="badge" [ngClass]="getEstadoBadgeClass(comisionista.estado)">
+              {{ getEstadoTexto(comisionista.estado) }}
+            </span>
+          </div>
+
+          <div class="comisionista-info mb-3">
+            <div class="info-item mb-2">
+              <i class="bi bi-envelope me-2"></i>
+              <small>{{ comisionista.email }}</small>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-telephone me-2"></i>
+              <small>{{ comisionista.telefono }}</small>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button 
+              class="btn btn-outline-primary btn-sm flex-fill"
+              (click)="verDetalles(comisionista)">
+              <i class="bi bi-eye me-1"></i>
+              Ver Detalles
+            </button>
+            <button 
+              class="btn btn-success btn-sm flex-fill"
+              (click)="vincularComisionista(comisionista)"
+              [disabled]="!puedeVincular(comisionista)">
+              <span *ngIf="!vinculando">
+                <i class="bi bi-link-45deg me-1"></i>
+                Vincular
+              </span>
+              <span *ngIf="vinculando">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Vinculando...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer con contador -->
+  <div *ngIf="!loading && comisionistas.length > 0" class="mt-4 text-center">
+    <small class="text-muted">
+      Total: {{ comisionistas.length }} comisionista(s) disponible(s)
+    </small>
+  </div>
+
+  <!-- Modal de Detalles -->
+  <div *ngIf="comisionistaSeleccionado" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-badge me-2"></i>
+            Detalles del Comisionista
+          </h5>
+          <button type="button" class="btn-close" (click)="cerrarDetalles()" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Imagen del Comisionista en Modal -->
+          <div class="text-center mb-4">
+            <img 
+              [src]="getImagenComisionista(comisionistaSeleccionado)" 
+              [alt]="getNombreCompleto(comisionistaSeleccionado)"
+              class="comisionista-imagen-modal"
+              onerror="this.src='assets/icon.png'">
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-12 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-hash me-2"></i>
+                  ID
+                </label>
+                <p class="info-value">{{ comisionistaSeleccionado.id }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-person me-2"></i>
+                  Nombre
+                </label>
+                <p class="info-value">{{ comisionistaSeleccionado.nombre }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-person me-2"></i>
+                  Apellido
+                </label>
+                <p class="info-value">{{ comisionistaSeleccionado.apellido }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-envelope me-2"></i>
+                  Email
+                </label>
+                <p class="info-value">{{ comisionistaSeleccionado.email }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-telephone me-2"></i>
+                  Teléfono
+                </label>
+                <p class="info-value">{{ comisionistaSeleccionado.telefono }}</p>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-toggle-on me-2"></i>
+                  Estado
+                </label>
+                <p class="info-value">
+                  <span class="badge" [ngClass]="getEstadoBadgeClass(comisionistaSeleccionado.estado)">
+                    {{ getEstadoTexto(comisionistaSeleccionado.estado) }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-success flex-fill"
+            (click)="vincularComisionista(comisionistaSeleccionado!)"
+            [disabled]="!puedeVincular(comisionistaSeleccionado!)">
+            <i class="bi bi-link-45deg me-2"></i>
+            Vincular con este Comisionista
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cerrarDetalles()">
+            <i class="bi bi-x-circle me-2"></i>
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

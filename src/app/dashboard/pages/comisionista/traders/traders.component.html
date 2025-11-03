@@ -1,0 +1,200 @@
+<div class="comisionistas-container p-4">
+  <div class="mb-4">
+    <h2 class="text-white mb-2">
+      <i class="bi bi-people-fill me-2"></i>
+      Traders Asociados
+    </h2>
+    <p class="text-muted">Lista de traders vinculados a tu cuenta de comisionista</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white mt-3">Cargando traders asociados...</p>
+  </div>
+
+  <!-- Tabla de Traders -->
+  <div *ngIf="!loading" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>ID</th>
+              <th>Nombre Completo</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="traders.length === 0">
+              <td colspan="8" class="text-center text-muted py-4">
+                <i class="bi bi-inbox me-2"></i>
+                No tienes traders asociados todavía
+              </td>
+            </tr>
+            <tr *ngFor="let trader of traders" class="table-row">
+              <td>
+                <img 
+                  [src]="getImagenTrader(trader)" 
+                  [alt]="getNombreCompleto(trader)"
+                  class="comisionista-imagen-tabla"
+                  onerror="this.src='assets/icon.png'">
+              </td>
+              <td>{{ trader.id }}</td>
+              <td>
+                <strong>{{ getNombreCompleto(trader) }}</strong>
+              </td>
+              <td>
+                <i class="bi bi-envelope me-2"></i>
+                {{ trader.email }}
+              </td>
+              <td>
+                <i class="bi bi-telephone me-2"></i>
+                {{ trader.telefono }}
+              </td>
+              <td>
+                <span class="badge bg-info">{{ trader.rol }}</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoBadgeClass(trader.estado)">
+                  {{ getEstadoTexto(trader.estado) }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  class="btn btn-sm btn-primary"
+                  (click)="verDetalles(trader)">
+                  <i class="bi bi-eye me-1"></i>
+                  Ver Detalles
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer bg-transparent border-top border-secondary">
+      <small class="text-muted">
+        Total: {{ traders.length }} trader(s) asociado(s)
+      </small>
+    </div>
+  </div>
+
+  <!-- Modal de Detalles -->
+  <div *ngIf="traderSeleccionado" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-badge me-2"></i>
+            Detalles del Trader
+          </h5>
+          <button type="button" class="btn-close" (click)="cerrarDetalles()" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Imagen del Trader en Modal -->
+          <div class="text-center mb-4">
+            <img 
+              [src]="getImagenTrader(traderSeleccionado)" 
+              [alt]="getNombreCompleto(traderSeleccionado)"
+              class="comisionista-imagen-modal"
+              onerror="this.src='assets/icon.png'">
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-12 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-hash me-2"></i>
+                  ID
+                </label>
+                <p class="info-value">{{ traderSeleccionado.id }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-person me-2"></i>
+                  Nombre
+                </label>
+                <p class="info-value">{{ traderSeleccionado.nombre }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-person me-2"></i>
+                  Apellido
+                </label>
+                <p class="info-value">{{ traderSeleccionado.apellido }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-envelope me-2"></i>
+                  Email
+                </label>
+                <p class="info-value">{{ traderSeleccionado.email }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-telephone me-2"></i>
+                  Teléfono
+                </label>
+                <p class="info-value">{{ traderSeleccionado.telefono }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-person-badge me-2"></i>
+                  Rol
+                </label>
+                <p class="info-value">
+                  <span class="badge bg-info">{{ traderSeleccionado.rol }}</span>
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="info-item">
+                <label class="info-label">
+                  <i class="bi bi-toggle-on me-2"></i>
+                  Estado
+                </label>
+                <p class="info-value">
+                  <span class="badge" [ngClass]="getEstadoBadgeClass(traderSeleccionado.estado)">
+                    {{ getEstadoTexto(traderSeleccionado.estado) }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarDetalles()">
+            <i class="bi bi-x-circle me-2"></i>
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

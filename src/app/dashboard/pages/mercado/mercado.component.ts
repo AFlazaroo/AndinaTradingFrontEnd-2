@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AccionColombia } from '../../../models/mercado-colombia.model';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ModalCompraComponent } from "../modals/modal-compra/modal-compra.component";
+import { ModalHistorialPreciosComponent } from "../modals/modal-historial-precios/modal-historial-precios.component";
 declare var bootstrap: any;
 
 @Component({
@@ -11,7 +12,7 @@ declare var bootstrap: any;
   standalone: true,
   templateUrl: './mercado.component.html',
   styleUrls: ['./mercado.component.scss'],
-  imports: [CommonModule, ModalCompraComponent]
+  imports: [CommonModule, ModalCompraComponent, ModalHistorialPreciosComponent]
 })
 
 
@@ -19,20 +20,47 @@ export class MercadoComponent implements OnInit {
   loading = true;
   uiMessage: string | null = null;
 
-  // Datos del mercado colombiano
+  // Datos del mercado
   acciones: AccionColombia[] = [];
-  accionesDestacadas: AccionColombia[] = []; // Ecopetrol, Bancolombia, Avianca
+  accionesDestacadas: AccionColombia[] = [];
+  
+  // Acciones organizadas por país
+  accionesColombia: AccionColombia[] = [];
+  accionesEcuador: AccionColombia[] = [];
+  accionesPeru: AccionColombia[] = [];
+  accionesVenezuela: AccionColombia[] = [];
   
   symbolSeleccionado: string = '';
   cantidad: number = 1;
   
   // Control de visualización de gráficos
-  mostrarGraficos: boolean = true; // Cambiar a false si los gráficos no funcionan
+  mostrarGraficos: boolean = true;
   
   // Lista de símbolos que no tienen gráfico disponible en TradingView
-  simbolosSinGrafico: string[] = ['AVH', 'AVIANCA', 'AVHOQ'];
+  simbolosSinGrafico: string[] = [
+    // Ecuador - No cotizan internacionalmente
+    'PRONACA', 'HOLCIM', 'FAVORITA', 'PICHINCHA', 'GUAYAQUIL',
+    // Perú - Locales sin cotización NYSE
+    'FERREYCORP', 'BACKUS',
+    // Venezuela - Mercado muy limitado
+    'PDVSA', 'CANTV', 'ELECTRICIDAD', 'BANVENEZ', 'SIDERURGICA',
+    // Colombia - Sin cotización internacional disponible
+    'NUTRESA', 'CELSIA', 'ISA', 'CEMARGOS', 'AVH', 'AVIANCA', 'AVHOQ', 'PFBCO', 'BOGOTA'
+  ];
+
+  // Mapeo de símbolos por país
+  private readonly simbolosPorPais = {
+    'Colombia': ['EC', 'CIB', 'PFBCO', 'NUTRESA', 'CELSIA', 'ISA', 'CEMARGOS', 'BOGOTA'],
+    'Ecuador': ['PRONACA', 'HOLCIM', 'FAVORITA', 'PICHINCHA', 'GUAYAQUIL'],
+    'Peru': ['BVN', 'BAP', 'SCCO', 'FERREYCORP', 'BACKUS'],
+    'Venezuela': ['PDVSA', 'CANTV', 'ELECTRICIDAD', 'BANVENEZ', 'SIDERURGICA']
+  };
 
   @ViewChild(ModalCompraComponent) modalCompra!: ModalCompraComponent;
+  
+  // Para el modal de historial de precios
+  simboloHistorial: string = '';
+  nombreEmpresaHistorial: string = '';
 
   constructor(
     private mercadoService: MercadoColombiaService,
@@ -50,13 +78,31 @@ export class MercadoComponent implements OnInit {
     }
   }
 
+  abrirModalHistorialPrecios(symbol: string, nombre: string = ''): void {
+    this.simboloHistorial = symbol;
+    this.nombreEmpresaHistorial = nombre;
+
+    const modalElement = document.getElementById('modalHistorialPrecios');
+    if (modalElement) {
+      const modalInstance = new bootstrap.Modal(modalElement);
+      modalInstance.show();
+    }
+  }
+
   onConfirmarCompra(cantidad: number): void {
-    const idUsuario = Number(localStorage.getItem('idUsuario'));
+    // Priorizar 'usuarioId' pero mantener compatibilidad con 'idUsuario'
+    const idUsuario = Number(localStorage.getItem('usuarioId') || localStorage.getItem('idUsuario'));
     
     console.log('🔍 Datos de compra:', {
       idUsuario,
       cantidad,
-      symbolSeleccionado: this.symbolSeleccionado
+      symbolSeleccionado: this.symbolSeleccionado,
+      localStorage: {
+        usuarioId: localStorage.getItem('usuarioId'),
+        idUsuario: localStorage.getItem('idUsuario'),
+        nombreUsuario: localStorage.getItem('nombreUsuario'),
+        rol: localStorage.getItem('rol')
+      }
     });
 
     if (!idUsuario || cantidad < 1) {
@@ -125,30 +171,86 @@ export class MercadoComponent implements OnInit {
   }
 
   /**
-   * Carga los datos del mercado colombiano
+   * Carga los datos del mercado
    */
   private cargarDatosMercado(): void {
-    this.loading = true;
-    this.uiMessage = null;
+    // Mostrar las acciones organizadas inmediatamente (sin loading)
+    this.organizarAccionesPorPais([]);
+    this.loading = false;
 
-    // Cargar todas las acciones disponibles
+    // Intentar cargar todas las acciones disponibles del backend (en segundo plano)
     this.mercadoService.getListadoAcciones().subscribe({
       next: (acciones) => {
         this.acciones = acciones;
-        console.log('Acciones colombianas cargadas:', acciones);
+        console.log('✅ Acciones cargadas del backend:', acciones.length);
+        
+        // Reorganizar con los datos reales si vienen del backend
+        this.organizarAccionesPorPais(acciones);
       },
       error: (error) => {
-        console.error('Error cargando acciones:', error);
-        this.uiMessage = error.message || 'Error al cargar datos del mercado colombiano';
-        this.acciones = [];
-      },
-      complete: () => {
-        this.loading = false;
+        console.error('❌ Error cargando acciones del backend:', error);
+        // No mostrar error porque ya tenemos las acciones organizadas
       }
     });
 
-    // Cargar acciones destacadas (Ecopetrol, Bancolombia, Avianca)
+    // Intentar cargar acciones destacadas (opcional, no bloquea la UI)
     this.cargarAccionesDestacadas();
+  }
+
+  /**
+   * Organiza las acciones por país según su símbolo
+   */
+  private organizarAccionesPorPais(acciones: AccionColombia[]): void {
+    // Diccionario de nombres por símbolo (según lista del usuario)
+    const nombrePorSimbolo: Record<string, string> = {
+      // Colombia
+      EC: 'Ecopetrol', CIB: 'Bancolombia', PFBCO: 'Banco Davivienda', NUTRESA: 'Grupo Nutresa',
+      CELSIA: 'Celsia', ISA: 'ISA', CEMARGOS: 'Cementos Argos', BOGOTA: 'Banco de Bogotá',
+      // Ecuador
+      PRONACA: 'Procesadora Nacional de Alimentos', HOLCIM: 'Holcim Ecuador', FAVORITA: 'La Favorita (Supermaxi)',
+      PICHINCHA: 'Banco Pichincha', GUAYAQUIL: 'Banco de Guayaquil',
+      // Perú
+      BVN: 'Compañía de Minas Buenaventura', BAP: 'Credicorp', SCCO: 'Southern Copper Corporation',
+      FERREYCORP: 'Ferreycorp', BACKUS: 'Backus',
+      // Venezuela
+      PDVSA: 'Petróleos de Venezuela', CANTV: 'CANTV', ELECTRICIDAD: 'Electricidad de Caracas',
+      BANVENEZ: 'Banco de Venezuela', SIDERURGICA: 'Siderúrgica del Orinoco'
+    };
+
+    const porSimbolo: Record<string, AccionColombia> = {};
+    for (const a of acciones) {
+      porSimbolo[a.simbolo.toUpperCase()] = a;
+    }
+
+    const crearAccionFallback = (sim: string): AccionColombia => ({
+      simbolo: sim,
+      nombre: nombrePorSimbolo[sim] || sim,
+      precioActual: 0,
+      apertura: 0,
+      maximo: 0,
+      minimo: 0,
+      volumen: 0,
+      variacionPorcentual: 0
+    } as unknown as AccionColombia);
+
+    const buildLista = (pais: keyof typeof this.simbolosPorPais): AccionColombia[] => {
+      return this.simbolosPorPais[pais].map(sim => {
+        const key = sim.toUpperCase();
+        return porSimbolo[key] || crearAccionFallback(key);
+      });
+    };
+
+    this.accionesColombia = buildLista('Colombia');
+    this.accionesEcuador = buildLista('Ecuador');
+    this.accionesPeru = buildLista('Peru');
+    this.accionesVenezuela = buildLista('Venezuela');
+
+    console.log('📊 Acciones por país:', {
+      Colombia: this.accionesColombia.length,
+      Ecuador: this.accionesEcuador.length,
+      Peru: this.accionesPeru.length,
+      Venezuela: this.accionesVenezuela.length
+    });
   }
 
   /**
@@ -175,7 +277,7 @@ export class MercadoComponent implements OnInit {
    * Nota: No todas las acciones colombianas están disponibles en TradingView
    */
   getChartUrl(simbolo: string): SafeResourceUrl {
-    // Mapeo de símbolos colombianos y estadounidenses al formato de TradingView
+    // Mapeo de símbolos al formato de TradingView
     const symbolMap: { [key: string]: string } = {
       // Acciones estadounidenses (para pruebas)
       'AAPL': 'NASDAQ:AAPL',         // Apple
@@ -183,16 +285,20 @@ export class MercadoComponent implements OnInit {
       'GOOGL': 'NASDAQ:GOOGL',       // Google
       'TSLA': 'NASDAQ:TSLA',         // Tesla
       'AMZN': 'NASDAQ:AMZN',         // Amazon
-      // Acciones colombianas en NYSE
-      'EC': 'NYSE:EC',               // Ecopetrol cotiza en NYSE como EC
+      
+      // 🇨🇴 COLOMBIA - NYSE
+      'EC': 'NYSE:EC',               // Ecopetrol
       'ECOPETROL': 'NYSE:EC',
-      'CIB': 'NYSE:CIB',             // Bancolombia cotiza en NYSE
+      'CIB': 'NYSE:CIB',             // Bancolombia
       'BANCOLOMBIA': 'NYSE:CIB',
-      'AVH': 'OTC:AVHOQ',            // Avianca Holdings en mercados OTC (EE.UU.)
-      'AVIANCA': 'OTC:AVHOQ',
-      'AVHOQ': 'OTC:AVHOQ',          // Avianca Holdings OTC
-      'AVT_P': 'BVC:AVT_P',          // Avianca preferentes en BVC
-      // Otras empresas colombianas en NYSE/mercados internacionales
+      // Nota: PFBCO, BOGOTA, AVH/AVIANCA no están disponibles en TradingView o NYSE
+      
+      // 🇵🇪 PERÚ - NYSE
+      'BVN': 'NYSE:BVN',             // Buenaventura
+      'BAP': 'NYSE:BAP',             // Credicorp
+      'SCCO': 'NYSE:SCCO',           // Southern Copper
+      
+      // Otros
       'ISA': 'NYSE:ISA',
       'GEB': 'NYSE:GEB',
       'CEMARGOS': 'NYSE:CLH',
@@ -227,6 +333,42 @@ export class MercadoComponent implements OnInit {
    */
   deberaMostrarGrafico(simbolo: string): boolean {
     if (!this.mostrarGraficos) return false;
-    return !this.simbolosSinGrafico.includes(simbolo.toUpperCase());
+    if (!simbolo || simbolo.trim() === '') return false;
+    const simboloUpper = simbolo.toUpperCase().trim();
+    const noTieneGrafico = this.simbolosSinGrafico.includes(simboloUpper);
+    return !noTieneGrafico;
+  }
+
+  /**
+   * Formatea el precio mostrando "N/A" si es 0 o no está disponible
+   */
+  formatearPrecio(accion: AccionColombia): string {
+    if (!accion || !accion.precioActual || accion.precioActual === 0) {
+      return 'N/A';
+    }
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(accion.precioActual);
+  }
+
+  /**
+   * Formatea el porcentaje de variación mostrando "--" si es 0 o no está disponible
+   */
+  formatearVariacionPorcentual(accion: AccionColombia): string {
+    const variacion = this.getVariacionPorcentual(accion);
+    if (variacion === 0 || variacion === null || variacion === undefined || isNaN(variacion)) {
+      return '--';
+    }
+    return `${variacion >= 0 ? '+' : ''}${variacion.toFixed(2)}%`;
+  }
+
+  /**
+   * Verifica si la acción tiene datos de precio disponibles
+   */
+  tieneDatosPrecio(accion: AccionColombia): boolean {
+    return accion && accion.precioActual !== undefined && accion.precioActual !== null && accion.precioActual > 0;
   }
 }

@@ -23,22 +23,27 @@ export class OperacionesComponent implements OnInit {
   }
 
   cargarHistorial(): void {
-    const idUsuario = Number(localStorage.getItem('idUsuario'));
+    // Priorizar 'usuarioId' pero mantener compatibilidad con 'idUsuario'
+    const idUsuario = Number(localStorage.getItem('usuarioId') || localStorage.getItem('idUsuario'));
+    
+    console.log('📋 Cargando historial para usuario:', idUsuario);
+    
     if (!idUsuario) {
-      this.errorMessage = 'Usuario no autenticado';
+      this.errorMessage = 'Usuario no autenticado. Por favor, inicia sesión.';
       this.loading = false;
+      console.error('❌ No se encontró usuarioId en localStorage');
       return;
     }
 
     this.loading = true;
     this.mercadoService.getHistorialTransacciones(idUsuario).subscribe({
       next: (data) => {
-        console.log('Historial de transacciones:', data);
+        console.log('✅ Historial de transacciones recibido:', data);
         this.transacciones = data;
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error al cargar historial:', err);
+        console.error('❌ Error al cargar historial:', err);
         this.errorMessage = 'Error al cargar el historial de transacciones';
         this.loading = false;
       }

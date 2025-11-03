@@ -1,0 +1,74 @@
+<!-- modal-venta.component.html -->
+<div class="modal fade" #modalVenta id="modalVenta" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-cart-dash me-2"></i>
+          Vender Acciones
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="close()" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info mb-3">
+          <strong>{{ symbol }}</strong> - {{ nombreEmpresa }}
+          <br>
+          <small>Cantidad disponible: <strong>{{ cantidadDisponible }}</strong> acciones</small>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Cantidad a vender</label>
+          <input 
+            type="number" 
+            [(ngModel)]="cantidad" 
+            [max]="cantidadDisponible"
+            min="1" 
+            class="form-control" 
+            placeholder="Ingrese la cantidad" />
+          <small class="text-muted">Máximo: {{ cantidadDisponible }} acciones</small>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Precio de mercado actual (información)</label>
+          <div class="input-group">
+            <span class="input-group-text">USD $</span>
+            <input 
+              type="text" 
+              [value]="precioFormateado"
+              class="form-control" 
+              readonly
+              disabled
+              style="background-color: #e9ecef; cursor: not-allowed;" />
+          </div>
+          <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            El precio se obtendrá automáticamente del mercado en tiempo real al confirmar la venta
+          </small>
+        </div>
+
+        <div class="alert alert-warning mb-3">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Importante:</strong> El precio final puede variar según las condiciones del mercado al momento de ejecutar la orden.
+        </div>
+
+        <div class="alert alert-secondary mb-0">
+          <strong>Total estimado a recibir:</strong> 
+          <span class="fs-5 text-success">{{ valorTotalEstimado | currency:'USD':'symbol':'1.2-2' }}</span>
+          <br>
+          <small class="text-muted">(Estimado basado en el precio actual del mercado)</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="close()">Cancelar</button>
+        <button 
+          class="btn btn-danger" 
+          (click)="onConfirmar()"
+          [disabled]="!puedeVender">
+          <i class="bi bi-cart-dash me-2"></i>
+          Confirmar Venta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

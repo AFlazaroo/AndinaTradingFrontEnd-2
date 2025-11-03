@@ -1,0 +1,175 @@
+<div class="enviar-orden-container p-4">
+  <div class="mb-4">
+    <h2 class="text-white mb-2">
+      <i class="bi bi-send me-2"></i>
+      Enviar Orden de Compra
+    </h2>
+    <p class="text-muted">Envía una orden de compra a uno de tus traders asociados</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Success -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="Cerrar"></button>
+  </div>
+
+  <!-- Spinner cargando traders -->
+  <div *ngIf="loadingTraders" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white mt-3">Cargando traders asociados...</p>
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="!loadingTraders" class="card">
+    <div class="card-body p-4">
+      <form [formGroup]="ordenForm" (ngSubmit)="onSubmit()">
+        <!-- Trader -->
+        <div class="mb-3">
+          <label for="idTrader" class="form-label">
+            <i class="bi bi-person me-2"></i>
+            Trader Destinatario <span class="text-danger">*</span>
+          </label>
+          <select
+            id="idTrader"
+            formControlName="idTrader"
+            class="form-control"
+            [class.is-invalid]="getCampoInvalido('idTrader')">
+            <option value="">Selecciona un trader</option>
+            <option *ngFor="let trader of traders" [value]="trader.id">
+              {{ getNombreCompletoTrader(trader) }} ({{ trader.email }})
+            </option>
+          </select>
+          <div *ngIf="getCampoInvalido('idTrader')" class="invalid-feedback">
+            {{ getMensajeError('idTrader') }}
+          </div>
+          <small class="text-muted" *ngIf="traders.length === 0">
+            No tienes traders asociados. Primero debes tener traders vinculados a tu cuenta.
+          </small>
+        </div>
+
+        <!-- Símbolo -->
+        <div class="mb-3">
+          <label for="simbolo" class="form-label">
+            <i class="bi bi-tag me-2"></i>
+            Símbolo de la Acción <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            id="simbolo"
+            formControlName="simbolo"
+            class="form-control"
+            placeholder="Ej: AAPL, EC, CIB"
+            [class.is-invalid]="getCampoInvalido('simbolo')"
+            style="text-transform: uppercase;" />
+          <div *ngIf="getCampoInvalido('simbolo')" class="invalid-feedback">
+            {{ getMensajeError('simbolo') }}
+          </div>
+        </div>
+
+        <!-- Nombre Empresa -->
+        <div class="mb-3">
+          <label for="nombreEmpresa" class="form-label">
+            <i class="bi bi-building me-2"></i>
+            Nombre de la Empresa (Opcional)
+          </label>
+          <input
+            type="text"
+            id="nombreEmpresa"
+            formControlName="nombreEmpresa"
+            class="form-control"
+            placeholder="Ej: Apple Inc., Ecopetrol" />
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-3">
+          <label for="cantidad" class="form-label">
+            <i class="bi bi-123 me-2"></i>
+            Cantidad de Acciones <span class="text-danger">*</span>
+          </label>
+          <input
+            type="number"
+            id="cantidad"
+            formControlName="cantidad"
+            class="form-control"
+            placeholder="Ej: 10"
+            min="1"
+            [class.is-invalid]="getCampoInvalido('cantidad')" />
+          <div *ngIf="getCampoInvalido('cantidad')" class="invalid-feedback">
+            {{ getMensajeError('cantidad') }}
+          </div>
+        </div>
+
+        <!-- Precio Límite -->
+        <div class="mb-3">
+          <label for="precioLimite" class="form-label">
+            <i class="bi bi-currency-dollar me-2"></i>
+            Precio Límite (Opcional)
+          </label>
+          <input
+            type="number"
+            id="precioLimite"
+            formControlName="precioLimite"
+            class="form-control"
+            placeholder="Ej: 150.50"
+            min="0.01"
+            step="0.01"
+            [class.is-invalid]="getCampoInvalido('precioLimite')" />
+          <small class="text-muted">Precio máximo aceptado para la compra</small>
+          <div *ngIf="getCampoInvalido('precioLimite')" class="invalid-feedback">
+            {{ getMensajeError('precioLimite') }}
+          </div>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="mb-3">
+          <label for="mensaje" class="form-label">
+            <i class="bi bi-chat-left-text me-2"></i>
+            Mensaje (Opcional)
+          </label>
+          <textarea
+            id="mensaje"
+            formControlName="mensaje"
+            class="form-control"
+            rows="3"
+            placeholder="Mensaje opcional para el trader"></textarea>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="ordenForm.reset()"
+            [disabled]="enviando">
+            <i class="bi bi-x-circle me-2"></i>
+            Limpiar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="ordenForm.invalid || enviando || traders.length === 0">
+            <span *ngIf="!enviando">
+              <i class="bi bi-send me-2"></i>
+              Enviar Orden
+            </span>
+            <span *ngIf="enviando">
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Enviando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
