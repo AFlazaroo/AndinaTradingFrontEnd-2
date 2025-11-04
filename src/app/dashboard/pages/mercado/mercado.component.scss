@@ -2,14 +2,14 @@
 
 :host {
   display: block;
-  background-color: #000218;
+  background-color: #FFFFFF;
   min-height: 100vh;
   font-family: 'Alegreya Sans', sans-serif;
   margin: 0;
 }
 
 .mercado-container {
-  background-color: #000218;
+  background-color: #FFFFFF;
   min-height: 100vh;
 }
 
@@ -19,7 +19,7 @@
 }
 
 .dashboard-title {
-  color: white;
+  color: #333333;
   font-size: 45px;
   font-weight: bold;
   margin-bottom: 30px;
@@ -29,50 +29,45 @@
 }
 
 .portfolio-value-box {
-  background-color: #2E3446;
+  background-color: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 20px;
   padding: 25px 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
 }
 
 .portfolio-label {
-  font-size: 20px;
-  color: white;
+  font-size: 31px;
+  color: #333333;
   margin: 0;
   font-family: 'Alegreya Sans', sans-serif;
   font-weight: 600;
-  font-size: 31px;
 }
 
 .portfolio-amount {
   font-size: 42px;
-  color: #FFF;
+  color: #FF4B4B;
   font-weight: bold;
   margin-top: 20px;
   margin-bottom: 20px;
   font-family: 'Alegreya Sans', sans-serif;
- 
 }
 
 .data-box {
-  background-color: #2E3446;
+  background-color: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 12px;
   padding: 20px;
-  max-height: 400px; // o la altura que consideres adecuada
+  max-height: 400px;
   overflow-y: auto;
-  scrollbar-width: thin; /* para Firefox */
-  scrollbar-color: #888 transparent;
-}
-
-.data-box::-webkit-scrollbar {
-  width: 8px;
 }
 
 .data-box::-webkit-scrollbar-thumb {
-  background-color: #888;
+  background-color: #32CD32;
   border-radius: 4px;
 }
 
@@ -80,27 +75,19 @@
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 36px;
   font-weight: bold;
-  color: #ffffff;
+  color: #333333;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #ffffff;
+  border-bottom: 2px solid #FFD700;
 }
 
 .table {
-  background-color: transparent !important; // asegura que nada lo sobreescriba
-  color: white;
-  border-collapse: collapse;
-}
-
-.table thead,
-.table tbody,
-.table th,
-.table td {
   background-color: transparent !important;
+  color: #333333;
 }
 
 .table thead th {
-  color: #FFF;
+  color: #FF4B4B;
   font-size: 26px;
 }
 
@@ -113,11 +100,13 @@
   font-family: 'Alegreya Sans', sans-serif;
 }
 
-.text-danger{
+.text-danger {
+  color: #FF4B4B !important;
   font-weight: 600;
 }
 
 .text-success {
+  color: #32CD32 !important;
   font-weight: 600;
 }
 
@@ -183,93 +172,55 @@
 
 // Estilos específicos para el mercado colombiano
 .destacada-card {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  background: #FFFFFF;
   border-radius: 15px;
-  border: 2px solid #ffc107;
+  border: 2px solid #FFD700;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 8px 20px rgba(255, 75, 75, 0.2);
   }
 }
 
 .accion-card {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  background: #FFFFFF;
   border-radius: 15px;
+  border: 2px solid #FFD700;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(12, 167, 125, 0.2);
+    box-shadow: 0 8px 20px rgba(50, 205, 50, 0.2);
   }
 }
 
-.precio-info {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.75rem;
-}
-
-.info-adicional {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 0.75rem;
-}
-
-.chart-container,
-.chart-container-small {
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
-.chart-placeholder {
-  height: 200px;
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed rgba(12, 167, 125, 0.3);
-}
-
-.chart-placeholder-small {
-  height: 150px;
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed rgba(12, 167, 125, 0.3);
-}
-
 .btn-success {
-  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  background: #32CD32;
   border: none;
   transition: all 0.3s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
+    background: #2AB12A;
     transform: scale(1.05);
   }
 }
 
 .btn-outline-success {
-  border-color: #0ca77d;
-  color: #0ca77d;
+  border-color: #32CD32;
+  color: #32CD32;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #0ca77d;
-    border-color: #0ca77d;
+    background-color: #32CD32;
+    border-color: #32CD32;
     color: white;
   }
 }
 
 // Estilos para los headers de países
 .pais-header {
-  border-left: 4px solid #0ca77d;
+  border-left: 4px solid #32CD32;
   padding-left: 1rem;
   margin-bottom: 1.5rem;
 
@@ -295,18 +246,18 @@
 
 // Colores específicos para badges de países
 .badge.bg-primary {
-  background-color: #ffc107 !important; // Amarillo Colombia
+  background-color: #FFD700 !important; // Amarillo Colombia
 }
 
 .badge.bg-info {
-  background-color: #17a2b8 !important; // Azul Ecuador
+  background-color: #32CD32 !important; // Azul Ecuador
 }
 
 .badge.bg-danger {
-  background-color: #dc3545 !important; // Rojo Perú
+  background-color: #FF4B4B !important; // Rojo Perú
 }
 
 .badge.bg-warning {
-  background-color: #ffc107 !important; // Amarillo Venezuela
+  background-color: #FFD700 !important; // Amarillo Venezuela
 }
 

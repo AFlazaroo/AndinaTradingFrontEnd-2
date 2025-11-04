@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans&display=swap');
 
 .dashboard-container {
-  background-color: #000218;
+  background-color: #FFFFFF;
   min-height: 100vh;
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
 :host {
   display: block;
-  background-color: #000218;
+  background-color: #FFFFFF;
   min-height: 100vh;
   font-family: 'Alegreya Sans', sans-serif;
   margin: 0;
@@ -20,7 +20,7 @@
 }
 
 .dashboard-title {
-  color: white;
+  color: #333333;
   font-size: 45px;
   font-weight: bold;
   margin-bottom: 30px;
@@ -30,42 +30,42 @@
 }
 
 .portfolio-value-box {
-  background-color: #2E3446;
+  background-color: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 20px;
   padding: 25px 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
 }
 
 .portfolio-label {
-  font-size: 20px;
-  color: white;
+  font-size: 31px;
+  color: #333333;
   margin: 0;
   font-family: 'Alegreya Sans', sans-serif;
   font-weight: 600;
-  font-size: 31px;
 }
 
 .portfolio-amount {
   font-size: 42px;
-  color: #FFF;
+  color: #FF4B4B;
   font-weight: bold;
   margin-top: 20px;
   margin-bottom: 20px;
   font-family: 'Alegreya Sans', sans-serif;
- 
 }
 
 .data-box {
-  background-color: #2E3446;
+  background-color: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 12px;
   padding: 20px;
   max-height: 400px; // o la altura que consideres adecuada
   overflow-y: auto;
-  scrollbar-width: thin; /* para Firefox */
-  scrollbar-color: #888 transparent;
+  box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
 }
 
 .data-box::-webkit-scrollbar {
@@ -73,7 +73,7 @@
 }
 
 .data-box::-webkit-scrollbar-thumb {
-  background-color: #888;
+  background-color: #32CD32;
   border-radius: 4px;
 }
 
@@ -81,15 +81,15 @@
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 36px;
   font-weight: bold;
-  color: #ffffff;
+  color: #333333;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #ffffff;
+  border-bottom: 2px solid #FFD700;
 }
 
 .table {
-  background-color: transparent !important; // asegura que nada lo sobreescriba
-  color: white;
+  background-color: transparent !important;
+  color: #333333;
   border-collapse: collapse;
 }
 
@@ -101,24 +101,24 @@
 }
 
 .table thead th {
-  color: #FFF;
+  color: #FF4B4B;
   font-size: 26px;
 }
 
 .table td,
 .table th {
-  vertical-align: middle;
-  border: none; 
-  color: #FFF;
+  color: #333333;
   font-size: 24px;
   font-family: 'Alegreya Sans', sans-serif;
 }
 
-.text-danger{
+.text-danger {
+  color: #FF4B4B !important;
   font-weight: 600;
 }
 
 .text-success {
+  color: #32CD32 !important;
   font-weight: 600;
 }
 
@@ -134,12 +134,12 @@
 
 .info-top-bar .bi {
   font-size: 2rem;
-  color: #0CA77D;
+  color: #32CD32;
 }
 
 /* Línea blanca entre las filas del cuerpo */
 .table tbody tr {
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid #FFD700;
 }
 
 /* Elimina la línea después de la última fila */
@@ -149,7 +149,7 @@
 
 /* Línea blanca debajo del encabezado */
 .table thead tr {
-  border-bottom: 1px solid white;
+  border-bottom: 2px solid #FFD700;
 }
 
 /* Quitar cualquier borde interno */
@@ -184,19 +184,19 @@
 
 // Estilos específicos para operaciones
 .operaciones-container {
-  background-color: #000218;
+  background-color: #FFFFFF;
   min-height: 100vh;
 }
 
 .card {
-  background-color: #1a1d2e;
-  border: none;
+  background-color: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
 }
 
 .table tbody tr:hover {
-  background-color: rgba(12, 167, 125, 0.1);
+  background-color: rgba(50, 205, 50, 0.1);
   transition: background-color 0.3s ease;
 }
 
@@ -206,13 +206,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  background: #32CD32;
   border: none;
   padding: 0.5rem 1.5rem;
   transition: all 0.3s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
+    background: #2AB12A;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3);
   }
 }

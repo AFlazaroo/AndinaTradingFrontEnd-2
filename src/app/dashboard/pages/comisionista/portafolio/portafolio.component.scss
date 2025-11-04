@@ -1,37 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans&display=swap');
 
 .portafolio-container {
-  background-color: #000218;
+  background-color: #FFFFFF; // White background
   min-height: 100vh;
   font-family: 'Alegreya Sans', sans-serif;
 }
 
 .card {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  background: #FFFFFF; // White background for cards
   border-radius: 15px;
-  border: none;
-  color: white;
+  border: 2px solid #FFD700; // Yellow borders
+  color: #333333; // Dark gray for main text
 }
 
 .summary-card {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  background: #FFFFFF; // White background for cards
   border-radius: 15px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(12, 167, 125, 0.3);
+    box-shadow: 0 8px 20px rgba(255, 75, 75, 0.2); // Red shadow
   }
 
   .card-title {
-    color: #ccc;
+    color: #666666; // Medium gray for secondary text
     font-size: 1rem;
     margin-bottom: 0.5rem;
     font-weight: 600;
   }
 
   .card-value {
-    color: #0CA77D;
+    color: #32CD32; // Green for success/positive
     font-size: 2rem;
     margin: 0;
     font-weight: bold;
@@ -39,16 +39,16 @@
 }
 
 .table {
-  color: white;
+  color: #333333; // Dark gray for main text
   background-color: transparent;
 
   thead {
-    background-color: rgba(12, 167, 125, 0.1);
+    background-color: rgba(50, 205, 50, 0.1); // Light green background
     
     th {
-      color: #fff;
+      color: #333333; // Dark gray for main text
       font-weight: 600;
-      border-bottom: 2px solid #0ca77d;
+      border-bottom: 2px solid #32CD32; // Green border
       padding: 1rem;
     }
   }
@@ -59,7 +59,7 @@
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: rgba(12, 167, 125, 0.1);
+        background-color: rgba(50, 205, 50, 0.1); // Light green background on hover
       }
 
       td {
@@ -71,26 +71,26 @@
 }
 
 .text-success {
-  color: #0CA77D !important;
+  color: #32CD32 !important; // Green for success/positive
   font-weight: 600;
 }
 
 .text-danger {
-  color: #dc3545 !important;
+  color: #FF4B4B !important; // Red for danger/important
   font-weight: 600;
 }
 
 .text-muted {
-  color: #6c757d !important;
+  color: #666666 !important; // Medium gray for secondary text
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #dc3545, #c82333);
+  background: #FF4B4B; // Red for danger buttons
   border: none;
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #c82333, #dc3545);
+    background: #FF3333; // Darker red for hover
     transform: scale(1.05);
   }
 
@@ -101,12 +101,12 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  background: #32CD32; // Green for primary buttons
   border: none;
   transition: all 0.3s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
+    background: #2AB12A; // Darker green for hover
     transform: scale(1.05);
   }
 }
