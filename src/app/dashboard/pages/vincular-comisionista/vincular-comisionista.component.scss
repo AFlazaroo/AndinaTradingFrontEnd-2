@@ -1,28 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans&display=swap');
 
 .vincular-comisionista-container {
-  background-color: #000218;
+  background-color: #FFFFFF; // base blanco
   min-height: 100vh;
   font-family: 'Alegreya Sans', sans-serif;
+  color: #333333;
 }
 
 .card {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  background: #FFFFFF;
   border-radius: 15px;
-  border: none;
-  color: white;
+  border: 2px solid #FFD700; // borde amarillo
+  color: #333333;
   transition: all 0.3s ease;
+  box-shadow: 0 6px 18px rgba(255, 75, 75, 0.04); // sombra sutil roja
 }
 
 .comisionista-card {
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(12, 167, 125, 0.3);
+    box-shadow: 0 10px 30px rgba(50, 205, 50, 0.12); // glow verde en hover
   }
 }
 
 .card-title {
-  color: #fff;
+  color: #333333;
   font-weight: 600;
   font-size: 1.2rem;
 }
@@ -32,8 +34,8 @@
   height: 120px;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid #0ca77d;
-  box-shadow: 0 4px 15px rgba(12, 167, 125, 0.3);
+  border: 3px solid #32CD32; // borde verde
+  box-shadow: 0 4px 15px rgba(50, 205, 50, 0.12);
   transition: transform 0.3s ease;
 }
 
@@ -46,19 +48,20 @@
   height: 150px;
   object-fit: cover;
   border-radius: 50%;
-  border: 4px solid #0ca77d;
-  box-shadow: 0 6px 20px rgba(12, 167, 125, 0.4);
+  border: 4px solid #32CD32;
+  box-shadow: 0 6px 20px rgba(50, 205, 50, 0.14);
 }
 
 .comisionista-info {
   .info-item {
     display: flex;
     align-items: center;
-    color: #ccc;
+    color: #666666;
     font-size: 0.9rem;
     
     i {
-      color: #0ca77d;
+      color: #FFD700; // iconos en amarillo
+      margin-right: 0.5rem;
     }
   }
 }
@@ -67,16 +70,21 @@
   padding: 0.5em 0.75em;
   font-size: 0.85rem;
   font-weight: 600;
+  background-color: #FFD700;
+  color: #333333;
+  border-radius: 6px;
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  background: linear-gradient(135deg, #32CD32, #2AB12A); // verde CTA
   border: none;
+  color: #ffffff;
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #2AB12A, #32CD32);
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(50, 205, 50, 0.18);
   }
 
   &:disabled {
@@ -86,60 +94,63 @@
 }
 
 .btn-outline-primary {
-  border-color: #0ca77d;
-  color: #0ca77d;
+  border-color: #32CD32;
+  color: #32CD32;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #0ca77d;
-    border-color: #0ca77d;
-    color: white;
+    background-color: #32CD32;
+    border-color: #32CD32;
+    color: #ffffff;
   }
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #6c757d, #5a6268);
+  background: linear-gradient(135deg, #666666, #5a5a5a);
   border: none;
+  color: #ffffff;
 }
 
 .form-check-input {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
 
   &:checked {
-    background-color: #0ca77d;
-    border-color: #0ca77d;
+    background-color: #32CD32;
+    border-color: #32CD32;
   }
 }
 
 .form-check-label {
   user-select: none;
   cursor: pointer;
+  color: #333333;
 }
 
 // Modal
 .modal-content {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
-  border: none;
+  background: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 15px;
-  color: white;
+  color: #333333;
 }
 
 .modal-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.25);
 }
 
 .modal-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 215, 0, 0.25);
 }
 
 .btn-close {
-  filter: invert(1);
+  filter: none;
+  color: #333333;
 }
 
 .info-item {
   .info-label {
-    color: #ccc;
+    color: #666666;
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
@@ -147,7 +158,7 @@
   }
 
   .info-value {
-    color: #fff;
+    color: #333333;
     font-size: 1.1rem;
     margin: 0;
     font-weight: 500;
@@ -157,11 +168,12 @@
 .alert {
   border-radius: 10px;
   border: none;
+  padding: 0.75rem 1rem;
 }
 
 .alert-info {
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(13, 110, 253, 0.1));
-  border-left: 4px solid #0d6efd;
-  color: #cfe2ff;
+  background: rgba(255, 215, 0, 0.08); // fondo amarillo suave
+  border-left: 4px solid #FFD700;
+  color: #333333;
 }
 

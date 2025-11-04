@@ -1,28 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans&display=swap');
 
 .ordenes-pendientes-container {
-  background-color: #000218;
+  background-color: #FFFFFF;
   min-height: 100vh;
   font-family: 'Alegreya Sans', sans-serif;
 }
 
 .card {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
+  background: #FFFFFF;
   border-radius: 15px;
-  border: none;
-  color: white;
+  border: 2px solid #FFD700;
+  color: #333333;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
 }
 
 .orden-card {
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(12, 167, 125, 0.3);
+    box-shadow: 0 10px 30px rgba(50, 205, 50, 0.3);
   }
 }
 
 .card-title {
-  color: #fff;
+  color: #333333;
   font-weight: 600;
   font-size: 1.2rem;
 }
@@ -31,12 +32,13 @@
   .info-item {
     display: flex;
     align-items: center;
-    color: #ccc;
+    color: #666666;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
     
     i {
       width: 20px;
+      color: #FFD700;
     }
   }
 }
@@ -48,13 +50,14 @@
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  background: #32CD32;
   border: none;
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0d9e6f, #0ca77d);
+    background: #2AB12A;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3);
   }
 
   &:disabled {
@@ -64,13 +67,14 @@
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #dc3545, #c82333);
+  background: #FF4B4B;
   border: none;
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #c82333, #dc3545);
+    background: #FF3333;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
   }
 
   &:disabled {
@@ -80,50 +84,59 @@
 }
 
 .btn-outline-primary {
-  border-color: #0ca77d;
-  color: #0ca77d;
+  border-color: #32CD32;
+  color: #32CD32;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #0ca77d;
-    border-color: #0ca77d;
+    background-color: #32CD32;
+    border-color: #32CD32;
     color: white;
   }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0ca77d, #0d9e6f);
+  background: #32CD32;
   border: none;
+  
+  &:hover {
+    background: #2AB12A;
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3);
+  }
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #6c757d, #5a6268);
+  background: #666666;
   border: none;
+  
+  &:hover {
+    background: #555555;
+  }
 }
 
 // Modal
 .modal-content {
-  background: linear-gradient(135deg, #1c1f2c, #2e3446);
-  border: none;
+  background: #FFFFFF;
+  border: 2px solid #FFD700;
   border-radius: 15px;
-  color: white;
+  color: #333333;
 }
 
 .modal-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 .modal-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 .btn-close {
-  filter: invert(1);
+  filter: none;
 }
 
 .info-item {
   .info-label {
-    color: #ccc;
+    color: #666666;
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
@@ -131,7 +144,7 @@
   }
 
   .info-value {
-    color: #fff;
+    color: #333333;
     font-size: 1.1rem;
     margin: 0;
     font-weight: 500;

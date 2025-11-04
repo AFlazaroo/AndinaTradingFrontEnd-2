@@ -3,12 +3,12 @@
 :host {
   display: block;
   min-height: 100vh;
-  background-color: #060A1B;
+  background-color: #FFFFFF;
   font-family: 'Alegreya Sans', sans-serif;
 }
 
 .login-header {
-  background-color: #060A1B;
+  background-color: #FF4B4B;
   height: 60px;
   width: 100%;
   color: white;
@@ -28,6 +28,7 @@
   &:hover {
     text-decoration: underline;
     cursor: pointer;
+    color: #FFD700;
   }
 }
 
@@ -65,7 +66,7 @@
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 32px;
   font-weight: 400;
-  color: #444653;
+  color: #333333;
   display: block;
   margin-bottom: 0.5rem;
   text-align: left;
@@ -101,12 +102,12 @@
 
 
 .login-box {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   padding: 3rem;
   border-radius: 1.5rem;
   max-width: 959px;
   width: 100%;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(255, 75, 75, 0.1);
   
 }
 
@@ -115,7 +116,7 @@
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 64px;
   font-weight: 700;
-  color: #0CA77D;
+  color: #FF4B4B;
   line-height: 1.1;
   margin-bottom: 1rem;
   text-align: center;
@@ -126,7 +127,7 @@
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 24px;
   font-weight: 500;
-  color: #444653;
+  color: #333333;
   line-height: 1.4;
   margin-bottom: 2rem;
   text-align: center;
@@ -137,7 +138,7 @@
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 32px;
   font-weight: 400;
-  color: #444653;
+  color: #333333;
   margin-bottom: 0.5rem;
   display: block;
 }
@@ -148,15 +149,11 @@ input.form-control {
   padding-right: 15px;
   height: 45px;
   font-size: 1rem;
-}
-
-/* Enlace de recuperación */
-a {
-  font-size: 0.85rem;
-  color: #333;
-
-  &:hover {
-    text-decoration: underline;
+  border: 2px solid #FFD700;
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+    border-color: #FFD700;
   }
 }
 
@@ -164,8 +161,8 @@ a {
 .custom-login-btn {
   width: 306px;
   height: 75px;
-  background-color: #0CA77D;
-  border: 1px solid #0CA77D;
+  background-color: #32CD32;
+  border: none;
   border-radius: 25px;
   color: white;
   font-weight: 600;
@@ -173,12 +170,13 @@ a {
   font-family: 'Alegreya Sans', sans-serif;
   display: block;
   margin: 0 auto;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
   margin-top: 50px;
 
   &:hover {
-    background-color: #099a70;
-    border-color: #099a70;
+    background-color: #2AB12A;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(50, 205, 50, 0.3);
   }
 
   &:disabled {
@@ -187,17 +185,11 @@ a {
   }
 }
 
-/* Feedback de validación */
-.invalid-feedback {
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-}
-
 .forgot-link {
   font-family: 'Alegreya Sans', sans-serif;
   font-size: 18px;
   font-weight: 400;
-  color: #444653;
+  color: #FF4B4B;
   text-decoration: none;
   display: block;
   max-width: 720px;
@@ -207,6 +199,7 @@ a {
   margin-top: 50px;
 
   &:hover {
+    color: #FF3333;
     text-decoration: underline;
   }
 }
@@ -214,16 +207,16 @@ a {
 .toggle-password-btn {
   position: absolute;
   top: 50%;
-  right: 30px;             // ✅ puede ajustarse según tu diseño
+  right: 30px;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #444653;
+  color: #FFD700;
   font-size: 1.25rem;
   z-index: 2;
 
   &:hover {
-    color: #0CA77D;
+    color: #FF4B4B;
   }
 
   &:focus {
